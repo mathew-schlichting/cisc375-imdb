@@ -1,0 +1,24 @@
+{
+  "name": "Project3-Movies",
+  "version": "0.0.1",
+  "description": "Has movie things.",
+  "repository": {
+    "type": "git",
+    "url": "todo"
+  }
+  "dependencies": {
+
+  },
+  "author": "Mathew Schlichting",
+  "contributors": {
+    {
+      "name": "Mathew Schlichting",
+      "email": "schlichting@stthoams.edu"
+    },
+    {
+      "name": "partner",
+      "email": "todo"
+    }
+  }
+}
+
