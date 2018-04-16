@@ -1,16 +1,17 @@
 {
-  "name": "Project3-Movies",
+  "name": "cisc375-imbd",
   "version": "0.0.1",
   "description": "Has movie things.",
   "repository": {
     "type": "git",
     "url": "todo"
-  }
+  },
   "dependencies": {
-
+    "express": "^4.16.3",
+    "sqlite3": "^4.0.0"
   },
   "author": "Mathew Schlichting",
-  "contributors": {
+  "contributors": [
     {
       "name": "Mathew Schlichting",
       "email": "schlichting@stthoams.edu"
@@ -19,6 +20,5 @@
       "name": "partner",
       "email": "todo"
     }
-  }
+  ]
 }
-
