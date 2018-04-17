@@ -15,17 +15,17 @@
             </div>
         </div>
 
-        <form action="/search">
+        <form action="/search" enctype="multipart/form-data" method="POST">
             <div class="row padding-sm">
                 <div class="col-2">
-                    <select class="selectpicker full-size">
-                        <option>Actor/Actress</option>
-                        <option>Movie Title</option>
+                    <select class="selectpicker full-size" name="type">
+                        <option value="Names">Actor/Actress</option>
+                        <option value="Titles">Movie Title</option>
                     </select>
 
                 </div>
                 <div class="col-3">
-                    <input type="text" class="form-control" placeholder="search" id="search-text">
+                    <input type="text" class="form-control" name="search" placeholder="search" id="search-text">
                 </div>
             </div>
             <div class="row padding-sm">
