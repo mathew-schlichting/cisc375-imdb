@@ -52,15 +52,17 @@ app.post('/search', (req, res) =>{
 
             // fields.type[0]       =   table name
             // fields.search[0]     =   search value
+
 			var id = '';
-			if(fields.type[0]=='Names'){
+			if(fields.type[0] === 'Names'){
 				id = 'select_person';
-			}else if(fields.type[0]=='Titles'){
+			}else if(fields.type[0] === 'Titles'){
 				id = 'select_movie';
 			}
+
 			var title = fields.search[0];
 			database.init('../imdb.sqlite3');
-			var query = database.select(id,title);
+			var query = database.select(id, title);
 			console.log(query);
 
             results = [{id:'12345', name:'Brad Pitt the actor'}, {id:'12346', name:'Brad Pitt the non-actor'}];
@@ -83,9 +85,9 @@ app.post('/search', (req, res) =>{
                             res.writeHead(200, {'Content-Type': 'text/html'});
                             page = '' + main_template;
 
-                            page.replace('{{PAGE-TITLE}}', 'Results');
-                            page.replace('{{BODY}}', result_template + '');
-                            page.replace('{{SEARCH}}', fields.search[0]);
+                            page = page.replace('{{PAGE-TITLE}}', 'Results');
+                            page = page.replace('{{BODY}}', result_template + '');
+                            page = page.replace('{{SEARCH}}', fields.search[0]);
                             if(fields.type[0] === 'a') {
                                 //swap results with actor results
                             }
