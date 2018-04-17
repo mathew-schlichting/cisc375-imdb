@@ -6,10 +6,11 @@ var path    = require(  'path'  );
 // external dependencies
 var multiparty  = require(  'multiparty');
 var express     = require(  'express'   );
+var sqlite3     = require('sqlite3').verbose();
 
 // local dependencies
 var mime = require('./mime');
-
+var db   = require('./database');
 // application variables
 var app = express();
 var port = 8018;
@@ -52,9 +53,19 @@ app.post('/search', (req, res) =>{
         else{
 
             // do search here
-
-            // fields.type[0]       =   table name
+            
+			// fields.type[0]       =   table name
             // fields.search[0]     =   search value
+			var id = '';
+			if(fields.type[0]=='Names'){
+				id = 'select_person';
+			}else if(fields.type[0]=='Titles'){
+				id = 'select_movie';
+			}
+			var title = fields.search[0];
+			db.init('../imdb.sqlite3');
+			var query = db.select(id,title);
+			console.log(query);
 
             results = [{id:'12345', name:'Brad Pitt the actor'}, {id:'12346', name:'Brad Pitt the non-actor'}];
 
