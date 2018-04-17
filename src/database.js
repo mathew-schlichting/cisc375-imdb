@@ -2,24 +2,31 @@
  * Created by Mathew on 4/17/2018.
  */
 
-var databaseConnection = {};
+var connection = {};
 
 var sqlite3     = require(  'sqlite3'   );
 
-databaseConnection.query = {select_person: '', select_movie: ''};
+connection.query = {select_person: '', select_movie: ''};
 
 
-databaseConnection.init = function (location){
-    databaseConnection.db = new sqlite3.Database(location);
+connection.initDatabase = function (location){
+    connection.db = new sqlite3.Database(location);
 };
 
-databaseConnection.select = function (id){
-
+connection.select = function (id){
+    connection.db.each("SELECT nconst FROM Names", function(err, row) {
+        if(err){
+            console.log('error');
+        }
+        else {
+            console.log(row.nconst);
+        }
+    });
 };
 
-databaseConnection.close = function(){
-    databaseConnection.db.close();
+connection.close = function(){
+    connection.db.close();
 };
 
 
-module.exports = database;
+module.exports = connection;

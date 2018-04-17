@@ -9,6 +9,7 @@ var express     = require(  'express'   );
 
 // local dependencies
 var mime = require('./mime');
+var database = require('./database');
 
 // application variables
 var app = express();
@@ -25,6 +26,10 @@ app.use('/css', express.static(path.join(public_dir, 'css')));
 
 // home page should be static
 app.get('/', (req, res) => {
+    database.initDatabase('./../imdb.sqlite3');
+    database.select();
+
+
     res.sendFile(path.join(public_dir, 'index.html'));
 });
 
