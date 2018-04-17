@@ -10,7 +10,8 @@ var sqlite3     = require('sqlite3').verbose();
 
 // local dependencies
 var mime = require('./mime');
-var db   = require('./database');
+var database   = require('./database');
+
 // application variables
 var app = express();
 var port = 8018;
@@ -25,7 +26,12 @@ app.use('/css', express.static(path.join(public_dir, 'css')));
 
 
 // home page should be static
+
 app.get('/', (req, res) => {
+   // database.init('./../imdb.sqlite3');
+    //database.select();
+
+
     res.sendFile(path.join(public_dir, 'index.html'));
 });
 
@@ -63,8 +69,8 @@ app.post('/search', (req, res) =>{
 				id = 'select_movie';
 			}
 			var title = fields.search[0];
-			db.init('../imdb.sqlite3');
-			var query = db.select(id,title);
+			database.init('../imdb.sqlite3');
+			var query = database.select(id,title);
 			console.log(query);
 
             results = [{id:'12345', name:'Brad Pitt the actor'}, {id:'12346', name:'Brad Pitt the non-actor'}];

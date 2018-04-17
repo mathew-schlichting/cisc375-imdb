@@ -2,27 +2,27 @@
  * Created by Mathew on 4/17/2018.
  */
 
-var databaseConnection = {};
+var connection = {};
 
 var sqlite3     = require(  'sqlite3'   );
 
-databaseConnection.query = {
+connection.query = {
 	select_person: 'SELECT primary_name,birth_year,death_year,primary_profession FROM Names WHERE primary_name = ?', 
 	select_movie: 'SELECT primary_title,title_type,start_year,end_year FROM Titles WHERE primary_title = ?'
 };
 
 
-databaseConnection.init = function (location){
-    databaseConnection.db = new sqlite3.Database(location,(err)=>{
+connection.init = function (location){
+    connection.db = new sqlite3.Database(location,(err)=>{
 		if (err) {
 			console.error(err.message);
 		}	
 	});
 };
 
-databaseConnection.select = function (id,search){
+connection.select = function (id,search){
 	var results = [];
-	databaseConnection.db.all(databaseConnection.query[id],[search],(err, rows) => {
+	connection.db.all(connection.query[id],[search],(err, rows) => {
 		if (err) {
 			throw err;
 		}
@@ -32,11 +32,11 @@ databaseConnection.select = function (id,search){
 		});
 	});
 	return results;
+}
+
+connection.close = function(){
+    connection.db.close();
 };
 
-databaseConnection.close = function(){
-    databaseConnection.db.close();
-};
 
-
-module.exports = databaseConnection;
+module.exports = connection;
