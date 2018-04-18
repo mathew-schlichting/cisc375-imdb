@@ -51,8 +51,11 @@ app.post('/search', (req, res) =>{
         if(err){returnErrorMessage(res, 500, 'Internal Server Error!');}
         else{
             // successfully obtained search params from browser
-
-			database.select('select_' + fields.type[0], fields.search[0], (err, results) => {
+			search = fields.search[0];
+			search = search.replace(/\;/g,'');
+			search = search.replace(/\(/g,'');
+			search = search.replace(/\)/g,'');
+			database.select('select_' + fields.type[0], search, (err, results) => {
                 if(err){returnErrorMessage(res, 500, err);}
                 else {
                     // successfully obtained data from database
@@ -61,7 +64,7 @@ app.post('/search', (req, res) =>{
                         if(err){returnErrorMessage(res, 404, 'Unable to find file')}
                         else{
                             // successfully created template
-                            page = page.replace('{{SEARCH}}', fields.search[0]);
+                            page = page.replace('{{SEARCH}}', search);
 
                             var keys;
 
