@@ -15,7 +15,7 @@ connection.query = {
 	// movies
 	select_Titles: 'SELECT tconst AS id, primary_title, title_type, start_year, end_year FROM Titles WHERE primary_title = ?',
 	select_Titles_wild: 'SELECT tconst AS id, primary_title, title_type, start_year, end_year FROM Titles WHERE primary_title LIKE ?',
-	select_movie_by_id: 'SELECT primary_title, original_title, title_type, start_year, runtime_minutes, genres FROM Titles WHERE tconst = ?',
+    select_movie_by_id: 'SELECT primary_title, title_type, start_year, end_year, runtime_minutes, genres, average_rating, num_votes FROM Titles INNER JOIN Ratings ON Ratings.tconst = Titles.tconst WHERE Titles.tconst = ?',
 
 
 	todo: ''
