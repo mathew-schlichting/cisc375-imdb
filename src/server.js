@@ -65,8 +65,10 @@ app.post('/search', (req, res) =>{
 
                             var keys;
 
+                            console.log(results);
+
                             if (fields.type[0] === 'Names') {
-                                keys = ['']; //todo
+                                keys = ['primary_name', 'primary_profession', 'death_year', 'birth_year']; //todo
                             }
                             else if (fields.type[0] === 'Titles') {
                                 keys = ['primary_title', 'start_year', 'title_type', 'end_year'];
@@ -93,48 +95,59 @@ app.post('/search', (req, res) =>{
 app.get('/Names/:nconst', (req, res) => {
     console.log('Req: /Names/:nconst');
 
+    database.select('select_person_by_id', req.params.nconst, (err, results) => {
+        if(err){returnErrorMessage(res, 500, err);}
+        else if(results.length === 1){
+            // successfully obtained data from database
 
-    var html = '';
+            readyTemplate('person_template.html', (err, page) => {
+                if(err){returnErrorMessage(res, 404, 'Unable to find file')}
+                else {
+                    // successfully created template
+                    page = page.replace('{{NAME}}', results[0].primary_name);
+                    page = page.replace('{{BIRTH_YEAR}}', results[0].birth_year);
+                    page = page.replace('{{DEATH_YEAR}}', results[0].death_year === null ? 'Present' : results[0].death_year);
+                    page = page.replace('{{PROFESSION}}', results[0].primary_profession);
 
-    html += '<!DOCTYPE html>';
-    html += '<html>';
-    html +=     '<head>';
-    html +=         '<title>Person</title>';
-    html +=     '</head>';
-    html +=     '<body>';
-    html +=         '<h1>Hello World, person route</h1>';
-    html +=     '</body>';
-    html += '</html>';
+                    //respond to request
+                    res.writeHead(200, {'Content-Type': 'text/html'});
+                    res.write(page);
+                    res.end();
 
-
-
-    //respond to request
-    res.contentType('text/html');
-    res.send(html);
+                }
+            });
+        }
+        else{returnErrorMessage(res, 404, 'Person not found');}
+    });
 });
 
 
 // movie titles
-app.get('/Titles/:tcont', (req, res) =>{
-    console.log('Req: /Titles/:tcont');
+app.get('/Titles/:tconst', (req, res) =>{
+    console.log('Req: /Titles/:tconst');
 
+    database.select('select_movie_by_id', req.params.tconst, (err, results) => {
+        if(err){returnErrorMessage(res, 500, err);}
+        else if(results.length === 1){
+            // successfully obtained data from database
 
-    var html = '';
+            readyTemplate('movie_template.html', (err, page) => {
+                if(err){returnErrorMessage(res, 404, 'Unable to find file')}
+                else {
+                    // successfully created template
+                    page = page.replace('{{TITLE}}', results[0].primary_title);
+                    page = page.replace('{{YEAR}}', results[0].start_year);
 
-    html += '<!DOCTYPE html>';
-    html += '<html>';
-    html +=     '<head>';
-    html +=         '<title>Movie</title>';
-    html +=     '</head>';
-    html +=     '<body>';
-    html +=         '<h1>Hello World, movie route</h1>';
-    html +=     '</body>';
-    html += '</html>';
+                    //respond to request
+                    res.writeHead(200, {'Content-Type': 'text/html'});
+                    res.write(page);
+                    res.end();
 
-
-    //respond to request
-    res.contentType('text/html');
-    res.send(html);
+                }
+            });
+        }
+        else{returnErrorMessage(res, 404, 'Person not found');}
+    });
 });
 
 initServer();
