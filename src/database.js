@@ -15,9 +15,9 @@ connection.query = {
 	// movies
 	select_Titles: 'SELECT tconst AS id, primary_title, title_type, start_year, end_year FROM Titles WHERE primary_title = ?',
 	select_Titles_wild: 'SELECT tconst AS id, primary_title, title_type, start_year, end_year FROM Titles WHERE primary_title LIKE ?',
-    select_movie_by_id: 'SELECT primary_title, title_type, start_year, end_year, runtime_minutes, genres, average_rating, num_votes FROM Titles INNER JOIN Ratings ON Ratings.tconst = Titles.tconst WHERE Titles.tconst = ?',
-
-
+    select_movie_by_id: 'SELECT primary_title, title_type, start_year, end_year, runtime_minutes, genres, average_rating, num_votes FROM Titles LEFT JOIN Ratings ON Ratings.tconst = Titles.tconst WHERE Titles.tconst = ?',
+	select_cast: 'SELECT Principals.nconst AS id, primary_name, category, characters FROM Principals INNER JOIN Names ON Principals.nconst = Names.nconst WHERE tconst = ? ORDER BY ordering',
+	select_crew: 'SELECT directors,writers FROM Crew WHERE tconst = ?',
 	todo: ''
 };
 

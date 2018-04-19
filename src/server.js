@@ -142,7 +142,59 @@ app.get('/Names/:nconst', (req, res) => {
 // movie titles
 app.get('/Titles/:tconst', (req, res) =>{
     console.log('Req: /Titles/:tconst');
-
+	var cast = [];
+	database.select('select_cast', req.params.tconst, (err, results) => {
+		if(err){returnErrorMessage(res,500,err);}
+		cast = results;
+	});
+	database.select('select_crew', req.params.tconst, (err, results) => {
+		if(err){returnErrorMessage(res,500,err);}
+		var directors = [];
+		var writers = [];
+		if(results[0].directors !== null){
+			directors = results[0].directors.split(',');
+			for(dir in directors){
+				var flag = 0;
+				for(person in cast){
+					if(dir === person.id){
+						flag = 1;
+					}
+				}
+				if(flag===0){
+					/*TODO Fix this
+					database.select('select_person_by_id', dir, (err, person) => {
+						if(err){returnErrorMessage(res,500,err);}
+						console.log('person: ' + person[0]);
+						console.log('full obj of person: ' + person);
+						var add = {id: dir, primary_name: person[0].primary_name, category: "director", characters: null};
+						cast.push(add);
+					});*/
+				}
+			}
+		}
+		if(results[0].writers !== null){
+			writers = results[0].writers.split(',');
+			for(wri in writers){
+				var flag = 0;				     
+				for(person in cast){
+					if(wri === person.id){
+						flag = 1;
+					}
+				}
+				if(flag===0){
+					/*TODO fix this
+					database.select('select_person_by_id',wri,(err, person) => {
+						if(err){returnErrorMessage(res,500,err);}
+						console.log('person: ' + person[0]);
+						console.log('person obj: ' + person);
+						var add = {id: wri, primary_name: person[0].primary_name, category: "writer", characters: null};
+						cast.push(add);
+					});*/
+				}
+			}
+		}
+		console.log(cast);
+	});
     database.select('select_movie_by_id', req.params.tconst, (err, results) => {
         if(err){returnErrorMessage(res, 500, err);}
         else if(results.length === 1){
