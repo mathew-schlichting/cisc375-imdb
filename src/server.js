@@ -152,7 +152,7 @@ app.get('/Titles/:tconst', (req, res) =>{
                             page = page.replace('{{POSTER}}', '/images/no_poster.png');
                         }
                         else{
-                            page = page.replace('{{POSTER}}', data.host + data.path);
+                            page = page.replace('{{POSTER}}', 'http://' + data.host + data.path);
                         }
 
                         //respond to request
