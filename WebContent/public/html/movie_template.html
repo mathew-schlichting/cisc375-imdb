@@ -1,41 +1,62 @@
-<div class="row">
-    <div class="col-5">
-        <div class="row">
-            <div class="col-5">
-                Title: {{TITLE}} ({{YEAR}})
+<link rel="stylesheet" href="../css/movie-style.css"/>
+<div class="container">
+    <div class="row">
+        <div class="col-3">
+            <div class="poster-background padding-sm">
+                <img id="poster" name="{{POSTER_ID}}" src="/images/loading_poster.png" width="200px" height="300px"/>
             </div>
         </div>
-        <div class="row">
-            <div class="col-5">
-                Type: {{TYPE}}
+        <div class="col-9">
+            <div class="row">
+                <div class="col-9">
+                                <span class="title">
+                                    Title: {{TITLE}} ({{YEAR}})
+                                </span>
+                </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-5">
-                Length: {{RUN_TIME}}
+            <div class="row">
+                <div class="col-7">
+                                <span class="info">
+                                    Type: {{TYPE}}
+                                </span>
+                </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-5">
-                Genres: {{GENRES}}
+            <div class="row">
+                <div class="col-7">
+                                <span class="info">
+                                    Length: {{RUN_TIME}} min.
+                                </span>
+                </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-5">
-                Rating: {{RATING}} ({{VOTES}} votes)
+            <div class="row">
+                <div class="col-7">
+                                <span class="info">
+                                    Genres: {{GENRES}}
+                                </span>
+                </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-5">
-                Cast: yikes
+            <div class="row">
+                <div class="col-9">
+                    Cast: yikes
+                </div>
             </div>
-        </div>
 
+        </div>
     </div>
-    <div class="col-1">
-        <img src="{{POSTER}}" width="200px" height="300px"/>
+    <div class="row">
+        <div class="col-3">
+                        <span class="rating">
+                            Rating: {{RATING}}/10 Stars ({{VOTES}} votes)
+                        </span>
+        </div>
     </div>
 </div>
-
-
-
+<script>
+    var e = $('#poster');
+    $.get('/poster/Titles/' + e.attr('name'), function( data ) {
+        data = JSON.parse(data);
+        if(data.src) {
+            e.attr('src', data.src);
+        }
+    });
+</script>

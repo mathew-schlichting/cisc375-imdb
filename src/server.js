@@ -6,6 +6,8 @@ var path    = require(  'path'  );
 // external dependencies
 var multiparty  = require(  'multiparty');
 var express     = require(  'express'   );
+var favicon = require('serve-favicon');
+
 
 // local dependencies
 var mime = require('./mime');
@@ -16,6 +18,14 @@ var posters   = require('./imdb_poster');
 var app = express();
 var port = 8018;
 var public_dir = path.join(__dirname, '../WebContent/public');
+
+
+// simple replace all function to add simplicity
+// https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
+String.prototype.replaceAll = function(search, replacement) {
+    return this.replace(new RegExp(search, 'g'), replacement);
+};
+
 
 
 function initServer(){
@@ -31,6 +41,9 @@ function initServer(){
 app.use('/js',express.static(path.join(public_dir, 'js')));
 app.use('/css', express.static(path.join(public_dir, 'css')));
 app.use('/images', express.static(path.join(public_dir, 'images')));
+
+//favicon
+app.use(favicon(path.join(public_dir, 'images', 'favicon.ico')));
 
 
 // home page should be static
@@ -62,11 +75,11 @@ app.post('/search', (req, res) =>{
                 else {
                     // successfully obtained data from database
 
-                    readyTemplate('results_template.html', (err, page) => {
+                    readyTemplate('results_template.html', 'Results', (err, page) => {
                         if(err){returnErrorMessage(res, 404, 'Unable to find file')}
                         else{
                             // successfully created template
-                            page = page.replace('{{SEARCH}}', search);
+                            page = page.replaceAll('{{SEARCH}}', search);
 
                             var keys;
                             
@@ -78,7 +91,7 @@ app.post('/search', (req, res) =>{
                             }
 
 
-                            page = page.replace('{{RESULTS}}', generateResultsHTML(fields.type[0], results, keys));
+                            page = page.replaceAll('{{RESULTS}}', generateResultsHTML(fields.type[0], results, keys));
 
                             //respond to request
                             res.writeHead(200, {'Content-Type': 'text/html'});
@@ -103,15 +116,15 @@ app.get('/Names/:nconst', (req, res) => {
         else if(results.length === 1){
             // successfully obtained data from database
 
-            readyTemplate('person_template.html', (err, page) => {
+            readyTemplate('person_template.html', results[0].primary_name, (err, page) => {
                 if(err){returnErrorMessage(res, 404, 'Unable to find file')}
                 else {
                     // successfully created template
-                    page = page.replace('{{NAME}}', results[0].primary_name);
-                    page = page.replace('{{BIRTH_YEAR}}', results[0].birth_year);
-                    page = page.replace('{{DEATH_YEAR}}', results[0].death_year === null ? 'Present' : results[0].death_year);
-                    page = page.replace('{{PROFESSION}}', results[0].primary_profession);
-                    page = page.replace('{{KNOWN_FOR_TITLES}}', results[0].known_for_titles);
+                    page = page.replaceAll('{{NAME}}', results[0].primary_name);
+                    page = page.replaceAll('{{BIRTH_YEAR}}', results[0].birth_year);
+                    page = page.replaceAll('{{DEATH_YEAR}}', results[0].death_year === null ? 'Present' : results[0].death_year);
+                    page = page.replaceAll('{{PROFESSION}}', results[0].primary_profession);
+                    page = page.replaceAll('{{KNOWN_FOR_TITLES}}', results[0].known_for_titles);
 
                     //respond to request
                     res.writeHead(200, {'Content-Type': 'text/html'});
@@ -135,37 +148,53 @@ app.get('/Titles/:tconst', (req, res) =>{
         else if(results.length === 1){
             // successfully obtained data from database
 
-            readyTemplate('movie_template.html', (err, page) => {
+            readyTemplate('movie_template.html', results[0].primary_title, (err, page) => {
                 if(err){returnErrorMessage(res, 404, 'Unable to find file')}
                 else {
                     // successfully created template
-                    page = page.replace('{{TITLE}}',        results[0].primary_title);
-                    page = page.replace('{{YEAR}}',   results[0].start_year + (results[0].end_year === null ? '' : '-' +results[0].end_year));
-                    page = page.replace('{{TYPE}}',         results[0].type);
-                    page = page.replace('{{RUN_TIME}}',     results[0].runtime_minutes);
-                    page = page.replace('{{GENRES}}',       results[0].genres);
-                    page = page.replace('{{RATING}}',       results[0].average_rating);
-                    page = page.replace('{{VOTES}}',        results[0].num_votes);
+                    page = page.replaceAll('{{TITLE}}',        results[0].primary_title);
+                    page = page.replaceAll('{{YEAR}}',   results[0].start_year + (results[0].end_year === null ? '' : '-' +results[0].end_year));
+                    page = page.replaceAll('{{TYPE}}',         results[0].type || 'Unknown');
+                    page = page.replaceAll('{{RUN_TIME}}',     results[0].runtime_minutes);
+                    page = page.replaceAll('{{GENRES}}',       results[0].genres.replaceAll(',', ', '));
+                    page = page.replaceAll('{{RATING}}',       results[0].average_rating);
+                    page = page.replaceAll('{{VOTES}}',        results[0].num_votes);
+                    page = page.replaceAll('{{POSTER_ID}}', req.params.tconst);
 
-                    posters.GetPosterFromTitleId(req.params.tconst, (data) => {
-                        if(data.host === null){
-                            page = page.replace('{{POSTER}}', '/images/no_poster.png');
-                        }
-                        else{
-                            page = page.replace('{{POSTER}}', 'http://' + data.host + data.path);
-                        }
-
-                        //respond to request
-                        res.writeHead(200, {'Content-Type': 'text/html'});
-                        res.write(page);
-                        res.end();
-                    });
+                    //respond to request
+                    res.writeHead(200, {'Content-Type': 'text/html'});
+                    res.write(page);
+                    res.end();
                 }
             });
         }
         else{returnErrorMessage(res, 404, 'Movie not found');}
     });
 });
+
+
+app.get('/poster/Titles/:tconst', (req, res) => {
+    var result = {};
+
+    posters.GetPosterFromTitleId(req.params.tconst, function (data) {
+        if(data.host !== null) {
+            result.src = 'http://' + data.host + data.path;
+        }
+        else{
+            result.src = '/images/no_poster.png';
+        }
+
+        res.writeHead(200, {'Content-Type': 'text/plain'});
+        res.write(JSON.stringify(result));
+        res.end();
+    });
+
+
+
+});
+
+
+
 
 initServer();
 
@@ -208,7 +237,7 @@ function generateResultsHTML(type, data, keys){
     return html;
 }
 
-function readyTemplate(page, callback){
+function readyTemplate(page, title, callback){
     var template_location = path.join(public_dir, 'html');
     var result;
 
@@ -219,8 +248,8 @@ function readyTemplate(page, callback){
                 if (err) {callback(err);}
                 else {
                     result = '' + main_template;
-                    result = result.replace('{{PAGE-TITLE}}', 'Results');
-                    result = result.replace('{{BODY}}', page_template + '');
+                    result = result.replaceAll('{{PAGE-TITLE}}', title);
+                    result = result.replaceAll('{{BODY}}', page_template + '');
                     callback(undefined, result);
                 }
             });

@@ -1,0 +1,18 @@
+.rating{
+    font-size: .8em;
+}
+
+.title {
+    font-size: 3em;
+    font-family: "Agency Black", sans-serif;
+}
+
+.info {
+    font-size: 1.2em;
+}
+
+.poster-background{
+    background-color: black;
+    border-radius: 10px;
+    width: 232px;
+}

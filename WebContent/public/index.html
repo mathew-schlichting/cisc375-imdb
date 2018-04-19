@@ -1,40 +1,49 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Movies</title>
+		<title>IMDB Database</title>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 	    <link rel="stylesheet" href="css/styles.css"/>
 
     </head>
 	<body>
-        <div class="row padding-sm">
-            <div class="col-12">
-                <h1>
-                    Search for an Actor, Actress, or Movie!
-                </h1>
+        <div class="page-background">
+            <div class="container">
+                <div class="row padding-sm">
+                    <div class="col-12 text-center">
+                        <h1>
+                            IMDB Database
+                        </h1>
+                        <h1>
+                            Movies/Crew
+                        </h1>
+                    </div>
+                </div>
+
+                <form action="/search" enctype="multipart/form-data" method="POST">
+                    <div class="row padding-sm">
+                        <div class="col-3"></div>
+                        <div class="col-6">
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <select class="selectpicker full-size" name="type">
+                                        <option value="Names">Actor/Actress</option>
+                                        <option value="Titles">Movie Title</option>
+                                    </select>
+                                </div>
+                                <input type="text" class="form-control" name="search" placeholder="search" id="search-text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-5"></div>
+                        <div    class="col-2">
+                            <input class="btn btn-success full-size" type="submit" value="Search">
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
-
-        <form action="/search" enctype="multipart/form-data" method="POST">
-            <div class="row padding-sm">
-                <div class="col-2">
-                    <select class="selectpicker full-size" name="type">
-                        <option value="Names">Actor/Actress</option>
-                        <option value="Titles">Movie Title</option>
-                    </select>
-
-                </div>
-                <div class="col-3">
-                    <input type="text" class="form-control" name="search" placeholder="search" id="search-text">
-                </div>
-            </div>
-            <div class="row padding-sm">
-                <div class="col-3">
-                    <input class="btn btn-success" type="submit">
-                </div>
-            </div>
-        </form>
-
     </body>
 
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
