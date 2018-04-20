@@ -191,14 +191,13 @@ app.get('/Titles/:tconst', (req, res) =>{
 					}
 				}
 				if(flag===0){
-					/*TODO Fix this
 					database.select('select_person_by_id', dir, (err, person) => {
 						if(err){returnErrorMessage(res,500,err);}
 						console.log('person: ' + person[0]);
 						console.log('full obj of person: ' + person);
 						var add = {id: dir, primary_name: person[0].primary_name, category: "director", characters: null};
 						cast.push(add);
-					});*/
+					});
 				}
 			}
 		}
@@ -212,14 +211,14 @@ app.get('/Titles/:tconst', (req, res) =>{
 					}
 				}
 				if(flag===0){
-					/*TODO fix this
+					
 					database.select('select_person_by_id',wri,(err, person) => {
 						if(err){returnErrorMessage(res,500,err);}
 						console.log('person: ' + person[0]);
 						console.log('person obj: ' + person);
 						var add = {id: wri, primary_name: person[0].primary_name, category: "writer", characters: null};
 						cast.push(add);
-					});*/
+					});
 				}
 			}
 		}
