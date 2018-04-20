@@ -25,6 +25,12 @@ var public_dir = path.join(__dirname, '../WebContent/public');
 String.prototype.replaceAll = function(search, replacement) {
     return this.replace(new RegExp(search, 'g'), replacement);
 };
+String.prototype.nameNotation = function(){
+    var s = this;
+    s = s.toLowerCase();
+    s = s.charAt(0).toUpperCase() + s.substr(1);
+    return s;
+};
 
 
 
@@ -60,7 +66,10 @@ app.post('/search', (req, res) =>{
     console.log('Req: /search');
 
     var form;
-    
+    var i;
+    var html;
+    var template;
+
     form = new multiparty.Form();
     form.parse(req, (err, fields, files) => {
         if(err){returnErrorMessage(res, 500, 'Internal Server Error!');}
@@ -84,19 +93,40 @@ app.post('/search', (req, res) =>{
                             var keys;
                             
                             if (fields.type[0] === 'Names') {
-                                keys = ['primary_name', 'primary_profession', 'death_year', 'birth_year']; //todo
+                                keys = ['primary_name', 'primary_profession', 'death_year', 'birth_year'];
                             }
                             else if (fields.type[0] === 'Titles') {
                                 keys = ['primary_title', 'start_year', 'title_type', 'end_year'];
                             }
 
+                            fs.readFile(path.join(public_dir, 'html', fields.type[0] + '_item.html'), (err, data) =>{
+                                if(err){returnErrorMessage(res, 404, 'Cannot load template')}
+                                else{
 
-                            page = page.replaceAll('{{RESULTS}}', generateResultsHTML(fields.type[0], results, keys));
+                                    html = '';
+                                    for(i=0; i<results.length; i++){
+                                        template = '' + data;
 
-                            //respond to request
-                            res.writeHead(200, {'Content-Type': 'text/html'});
-                            res.write(page);
-                            res.end();
+                                        if (fields.type[0] === 'Names') {
+                                            template = template.replaceAll('{{NAME}}', results[i].primary_name);
+                                            template = template.replaceAll('{{YEAR}}', '(' + results[i].birth_year + '-' + (results[i].death_year === null ? 'Present' : results[i].death_year) + ')');
+                                            template = template.replaceAll('{{PROFESSION}}', results[i].primary_profession ? formatProfessions(results[i].primary_profession) : 'Unknown');
+                                        }
+                                        else if (fields.type[0] === 'Titles') {
+
+                                        }
+                                        html += template;
+                                    }
+
+                                        page = page.replaceAll('{{RESULTS}}', html);
+
+                                    //respond to request
+                                    res.writeHead(200, {'Content-Type': 'text/html'});
+                                    res.write(page);
+                                    res.end();
+                                }
+                            });
+
 
                         }
                     });
@@ -123,7 +153,7 @@ app.get('/Names/:nconst', (req, res) => {
                     page = page.replaceAll('{{NAME}}', results[0].primary_name);
                     page = page.replaceAll('{{BIRTH_YEAR}}', results[0].birth_year);
                     page = page.replaceAll('{{DEATH_YEAR}}', results[0].death_year === null ? 'Present' : results[0].death_year);
-                    page = page.replaceAll('{{PROFESSION}}', results[0].primary_profession);
+                    page = page.replaceAll('{{PROFESSION}}', formatProfessions(results[0].primary_profession));
                     page = page.replaceAll('{{KNOWN_FOR_TITLES}}', results[0].known_for_titles);
 
                     //respond to request
@@ -224,7 +254,7 @@ app.get('/Titles/:tconst', (req, res) =>{
     });
 });
 
-
+// get poster
 app.get('/poster/Titles/:tconst', (req, res) => {
     var result = {};
 
@@ -268,35 +298,26 @@ initServer();
 
 /********************************   Utility Functions   *****************************/
 
+function getFile(file, callback){
+    fs.readFile(file, callback);
+}
+
 function returnErrorMessage(res, code, message){
     res.writeHead(code, {'Content-Type': 'text/plain'});
     res.write(message);
     res.end()
 }
 
-function generateResultsHTML(type, data, keys){
-    var i;
-    var html = '';
-
-    for(i=0; i<data.length; i++){
-        html += '<li class="list-group-item padding-none">';
-        html +=     '<div class="btn btn-default full-size" onclick="window.location.href=\'/' + type + '/' + data[i].id + '\'">';
-        html +=         '<span class="result-text">' + data[i][keys[0]] +' ' + data[i][keys[1]] + '</span>';
-        html +=     '</div>';
-        html += '</li>';
-    }
-
-    return html;
-}
 
 function readyTemplate(page, title, callback){
     var template_location = path.join(public_dir, 'html');
     var result;
 
-    fs.readFile(path.join(template_location, 'main_template.html'), (err, main_template) => {
+
+    getFile(path.join(template_location, 'main_template.html'), (err, main_template) => {
         if (err) {callback(err);}
         else {
-            fs.readFile(path.join(template_location, page), (err, page_template) => {
+            getFile(path.join(template_location, page), (err, page_template) => {
                 if (err) {callback(err);}
                 else {
                     result = '' + main_template;
@@ -308,4 +329,25 @@ function readyTemplate(page, title, callback){
         }
     });
 }
+
+function formatProfessions(p){
+    var s = p.split(',');
+    var result = '';
+    for(var i=0; i<s.length; i++){
+        if(i !== 0){result += ' / ';}
+        result += s[i].nameNotation();
+    }
+    return result;
+}
+
+function yearRange(includePresent, start, end){
+    var result = '( ' + start;
+    if(includePresent){
+
+    }
+
+    return result + ' )';
+}
+
+
 /********************************************* ****************************************************/
