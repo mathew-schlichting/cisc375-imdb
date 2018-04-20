@@ -189,27 +189,29 @@ app.get('/Titles/:tconst', (req, res) =>{
 		var writers = [];
 		if(results[0].directors !== null){
 			directors = results[0].directors.split(',');
-			for(dir in directors){
+			for(var i = 0;i<directors.length;i++){
 				var flag = 0;
+				var dir = directors[i];
 				for(person in cast){
 					if(dir === person.id){
 						flag = 1;
 					}
 				}
 				if(flag===0){
-					database.select('select_person_by_id', dir, (err, person) => {
+					database.select('select_person_by_id', dir, (err, per) => {
 						if(err){returnErrorMessage(res,500,err);}
-						console.log('person: ' + person[0]);
-						console.log('full obj of person: ' + person);
-						var add = {id: dir, primary_name: person[0].primary_name, category: "director", characters: null};
-						cast.push(add);
+						if(per[0] !== undefined){
+							var add = {id: dir, primary_name: per[0].primary_name, category: "director", characters: null};
+							cast.push(add);
+						}
 					});
 				}
 			}
 		}
 		if(results[0].writers !== null){
 			writers = results[0].writers.split(',');
-			for(wri in writers){
+			for(var i = 0;i<writers.length;i++)
+				var wri = writers[i];{
 				var flag = 0;				     
 				for(person in cast){
 					if(wri === person.id){
@@ -218,17 +220,16 @@ app.get('/Titles/:tconst', (req, res) =>{
 				}
 				if(flag===0){
 					
-					database.select('select_person_by_id',wri,(err, person) => {
+					database.select('select_person_by_id',wri,(err, per) => {
 						if(err){returnErrorMessage(res,500,err);}
-						console.log('person: ' + person[0]);
-						console.log('person obj: ' + person);
-						var add = {id: wri, primary_name: person[0].primary_name, category: "writer", characters: null};
-						cast.push(add);
+						if(per[0]!==undefined){
+							var add = {id: wri, primary_name: per[0].primary_name, category: "writer", characters: null};
+							cast.push(add);
+						}
 					});
 				}
 			}
 		}
-		console.log(cast);
 	});
     database.select('select_movie_by_id', req.params.tconst, (err, results) => {
         if(err){returnErrorMessage(res, 500, err);}
@@ -247,6 +248,14 @@ app.get('/Titles/:tconst', (req, res) =>{
                     page = page.replaceAll('{{RATING}}',       results[0].average_rating);
                     page = page.replaceAll('{{VOTES}}',        results[0].num_votes);
                     page = page.replaceAll('{{POSTER_ID}}', req.params.tconst);
+					page = page.replaceAll('{{CAST}}', () => {
+						var list = '';
+						for(var i =0;i<cast.length;i++){
+							var person = cast[i];
+							list = list + person.primary_name + ', '+person.category+', ' +person.characters + '. \n';
+						}
+						return list;	
+					});
 
                     //respond to request
                     res.writeHead(200, {'Content-Type': 'text/html'});
