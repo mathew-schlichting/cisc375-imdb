@@ -110,11 +110,17 @@ app.post('/search', (req, res) =>{
                                         if (fields.type[0] === 'Names') {
                                             template = template.replaceAll('{{NAME}}', results[i].primary_name);
                                             template = template.replaceAll('{{YEAR}}', '(' + results[i].birth_year + '-' + (results[i].death_year === null ? 'Present' : results[i].death_year) + ')');
-                                            template = template.replaceAll('{{PROFESSION}}', results[i].primary_profession ? formatProfessions(results[i].primary_profession) : 'Unknown');
+                                            template = template.replaceAll('{{PROFESSION}}', results[i].primary_profession !== null ? formatProfessions(results[i].primary_profession) : 'Unknown');
                                         }
                                         else if (fields.type[0] === 'Titles') {
-
+                                            template = template.replaceAll('{{TITLE}}', results[i].primary_title);
+                                            template = template.replaceAll('{{YEAR}}', '(' + results[i].start_year + (results[i].end_year === null ? '' : '-' + results[i].end_year) + ')');
+                                            template = template.replaceAll('{{TYPE}}', results[i].title_type !== null ? results[i].title_type.nameNotation() : 'Unknown');
                                         }
+
+                                        template = template.replaceAll('{{LINK}}', '/' + fields.type[0] + '/' + results[i].id);
+
+
                                         html += template;
                                     }
 
@@ -151,10 +157,10 @@ app.get('/Names/:nconst', (req, res) => {
                 else {
                     // successfully created template
                     page = page.replaceAll('{{NAME}}', results[0].primary_name);
-                    page = page.replaceAll('{{BIRTH_YEAR}}', results[0].birth_year);
-                    page = page.replaceAll('{{DEATH_YEAR}}', results[0].death_year === null ? 'Present' : results[0].death_year);
+                    page = page.replaceAll('{{YEAR}}', results[0].birth_year + '-' + (results[0].death_year === null ? 'Present' : results[0].death_year));
                     page = page.replaceAll('{{PROFESSION}}', formatProfessions(results[0].primary_profession));
                     page = page.replaceAll('{{KNOWN_FOR_TITLES}}', results[0].known_for_titles);
+                    page = page.replaceAll('{{POSTER_ID}}', req.params.nconst);
 
                     //respond to request
                     res.writeHead(200, {'Content-Type': 'text/html'});
@@ -254,10 +260,17 @@ app.get('/Titles/:tconst', (req, res) =>{
 });
 
 // get poster
-app.get('/poster/Titles/:tconst', (req, res) => {
+app.get('/poster/:type/:tconst', (req, res) => {
     var result = {};
+    var getPoster;
 
-    posters.GetPosterFromTitleId(req.params.tconst, function (data) {
+    if(req.params.type === 'Names'){
+        getPoster = posters.GetPosterFromNameId;
+    } else if(req.params.type === 'Titles'){
+        getPoster = posters.GetPosterFromTitleId;
+    }
+    
+    getPoster(req.params.tconst, function (data) {
         if(data.host !== null) {
             result.src = 'http://' + data.host + data.path;
         }
@@ -269,9 +282,6 @@ app.get('/poster/Titles/:tconst', (req, res) => {
         res.write(JSON.stringify(result));
         res.end();
     });
-
-
-
 });
 
 
