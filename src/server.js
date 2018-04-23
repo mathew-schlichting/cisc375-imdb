@@ -152,6 +152,17 @@ app.put('/Names/:nconst', (req, res) =>{
     res.end();
 });
 
+app.put('/Titles/:nconst', (req, res) =>{
+    console.log('Req: PUT /Names/:nconst');
+
+    console.log(req.body);
+
+    //respond to request
+    res.writeHead(200, {'Content-Type': 'text/plain'});
+    res.write('success');
+    res.end();
+});
+
 app.get('/list/:type', (req, res) => {
 
     //respond to request

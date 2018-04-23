@@ -69,7 +69,7 @@ function saveEdit(){
     data.death_year = death_year.val();
 
         $.ajax({
-            url: '/Names/' + $('#poster').attr('name'),
+            url: '/Titles/' + $('#poster').attr('name'),
             type: 'PUT',
             contentType: 'application/json',
             data: JSON.stringify(data),
