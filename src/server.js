@@ -4,10 +4,10 @@ var url     = require(  'url'   );
 var path    = require(  'path'  );
 
 // external dependencies
-var multiparty  = require(  'multiparty');
-var express     = require(  'express'   );
-var favicon = require('serve-favicon');
-
+var multiparty  = require( 'multiparty'    );
+var express     = require( 'express'       );
+var favicon     = require( 'serve-favicon' );
+var bodyParser  = require( 'body-parser'   );
 
 // local dependencies
 var mime = require('./mime');
@@ -40,6 +40,10 @@ function initServer(){
     console.log('Now listening on port: ' + port);
     app.listen(port);
 }
+
+app.use(bodyParser.json());
+
+
 
 
 
@@ -143,9 +147,19 @@ app.post('/search', (req, res) =>{
 });
 
 
+app.put('/Names/:nconst', (req, res) =>{
+   console.log(req.body);
+
+    //respond to request
+    res.writeHead(200, {'Content-Type': 'text/plain'});
+    res.write('success');
+    res.end();
+});
+
+
 // people
 app.get('/Names/:nconst', (req, res) => {
-    console.log('Req: /Names/:nconst');
+    console.log('Req: GET /Names/:nconst');
 
     database.select('select_person_by_id', req.params.nconst, (err, results) => {
         if(err){returnErrorMessage(res, 500, err);}
