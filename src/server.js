@@ -18,7 +18,7 @@ var posters   = require('./imdb_poster');
 var app = express();
 var port = 8018;
 var public_dir = path.join(__dirname, '../WebContent/public');
-var professions_list = null;
+var preloaded_lists = {};
 
 // simple replace all function to add simplicity
 // https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
@@ -37,6 +37,9 @@ String.prototype.nameNotation = function(){
 function initServer(){
     database.init(path.join(__dirname, '..', 'imdb.sqlite3'));
     loadProfessionList();
+    loadGenreList();
+    loadTypeList();
+    
     console.log('Now listening on port: ' + port);
     app.listen(port);
 }
@@ -149,10 +152,11 @@ app.put('/Names/:nconst', (req, res) =>{
     res.end();
 });
 
-app.get('/Names/professions', (req, res) => {
+app.get('/list/:type', (req, res) => {
+
     //respond to request
     res.writeHead(200, {'Content-Type': 'text/plain'});
-    res.write(JSON.stringify(professions_list));
+    res.write(JSON.stringify(preloaded_lists[req.params.type]));
     res.end();
 });
 
@@ -348,7 +352,52 @@ function loadProfessionList(){
 
         data.list = list.substring(0, list.length - 1);
         data.list = data.list.replaceAll('_', ' ');
-        professions_list = data;
+        preloaded_lists.professions = data;
+    });
+}
+
+function loadGenreList(){
+    database.select('select_genres', undefined, (err, results) => {
+        var i;
+        var j;
+        var data = {};
+        var temp;
+        var list = '';
+
+        for(i=0; i<results.length; i++){
+            if(results[i].genres !== null) {
+                temp = results[i].genres.split(',');
+                for (j = 0; j < temp.length; j++) {
+                    if (!list.includes(temp[j])) {
+                        list += temp[j] + ',';
+                    }
+                }
+            }
+        }
+
+        data.list = list.substring(0, list.length - 1);
+        data.list = data.list.replaceAll('_', ' ');
+        preloaded_lists.genres = data;
+    });
+}
+
+function loadTypeList(){
+    database.select('select_types', undefined, (err, results) => {
+        var i;
+        var data = {};
+        var temp;
+        var list = '';
+
+        for(i=0; i<results.length; i++){
+            temp = results[i].title_type;
+            if(!list.includes(temp)) {
+                list += temp + ',';
+            }
+        }
+
+        data.list = list.substring(0, list.length - 1);
+        data.list = data.list.replaceAll('_', ' ');
+        preloaded_lists.types = data;
     });
 }
 

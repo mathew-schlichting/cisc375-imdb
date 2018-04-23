@@ -13,7 +13,11 @@ connection.query = {
 	select_person_by_id: 'SELECT primary_name, birth_year, death_year, primary_profession, known_for_titles FROM Names WHERE nconst = ?',
 	update_person_by_id: 'UPDATE Names SET birth_year = ?, death_year = ?, primary_profession = ? WHERE nconst = ?',
 	select_person_filter: 'SELECT primary_name, birth_year, death_year, primary_profession, known_for_titles FROM Names WHERE primary_name LIKE ? AND primary_profession LIKE ? COLLATE NOCASE',
+
+    //lists
     select_professions: 'SELECT primary_profession FROM Names',
+    select_genres: 'SELECT genres FROM Titles',
+    select_types: 'SELECT title_type FROM Titles',
 
 
     // movies
@@ -46,7 +50,7 @@ connection.select = function (id, search, callback){
         search = search.replace(/\;/g, '');
         search = search.replace(/\(/g, '');
         search = search.replace(/\)/g, '');
-        console.log(search);
+        //console.log(search);
         if (search.includes("*")) {
             search = search.replace(/\*/g, '%');
             id = id + "_wild";

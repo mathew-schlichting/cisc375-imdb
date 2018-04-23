@@ -8,16 +8,29 @@
         </div>
         <div class="col-9">
             <div class="row">
-                <div class="col-9">
+                <div class="col-10">
                     <span class="title">
-                        Title: {{TITLE}} ({{YEAR}})
+                        Title: {{TITLE}}
                     </span>
+                    <span id="year" class="title">
+                        ({{YEAR}})
+                    </span>
+                </div>
+                <div class="col-2">
+                    <div class="btn-group" role="group" aria-label="Basic example">
+                        <button id="edit-button" class="btn" onclick="startEdit();">Edit</button>
+                        <button id="cancel-button" class="btn btn-danger" onclick="cancelEdit();" style="visibility: hidden;">Cancel</button>
+                    </div>
+
                 </div>
             </div>
             <div class="row">
                 <div class="col-7">
                     <span class="info">
-                        Type: {{TYPE}}
+                        Type:
+                    </span>
+                    <span id="type" class="info">
+                        {{TYPE}}
                     </span>
                 </div>
             </div>
@@ -31,7 +44,10 @@
             <div class="row">
                 <div class="col-7">
                     <span class="info">
-                        Genres: {{GENRES}}
+                        Genres:
+                    </span>
+                    <span id="genres" class="info">
+                        {{GENRES}}
                     </span>
                 </div>
             </div>
@@ -51,12 +67,5 @@
         </div>
     </div>
 </div>
-<script>
-    var e = $('#poster');
-    $.get('/poster/Titles/' + e.attr('name'), function( data ) {
-        data = JSON.parse(data);
-        if(data.src) {
-            e.attr('src', data.src);
-        }
-    });
-</script>
+<script src="../js/movie-script.js"></script>
+<script src="../js/edit-script.js"></script>

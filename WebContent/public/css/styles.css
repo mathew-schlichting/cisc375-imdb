@@ -51,3 +51,8 @@
     background-size: cover;
     background-repeat: repeat-y;
 }
+
+
+.year-input {
+    width: 4em;
+}
