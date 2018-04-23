@@ -12,3 +12,15 @@
     border-radius: 10px;
     width: 232px;
 }
+
+.year-input {
+    width: 4em;
+}
+
+.profession-select{
+    height: 5em;
+    margin: 1em;
+}
+.select-label {
+    margin-top: 2em;
+}

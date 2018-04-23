@@ -2,6 +2,15 @@
     padding: 1em;
 }
 
+.padding-xs {
+    padding: 5px;
+}
+
+.margin-xs {
+    margin: 5px;
+}
+
+
 .padding-md {
     padding: 3em;
 }

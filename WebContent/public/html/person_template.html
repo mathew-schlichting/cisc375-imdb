@@ -10,11 +10,13 @@
             <div class="row">
                 <div class="col-10">
                     <span class="name">
-                        Name: {{NAME}} ({{YEAR}})
+                        Name: {{NAME}}
+                    </span>
+                    <span id="year" class="name">
+                        ({{YEAR}})
                     </span>
                 </div>
                 <div class="col-2">
-
                     <div class="btn-group" role="group" aria-label="Basic example">
                         <button id="edit-button" class="btn" onclick="startEdit();">Edit</button>
                         <button id="cancel-button" class="btn btn-danger" onclick="cancelEdit();" style="visibility: hidden;">Cancel</button>
@@ -24,9 +26,9 @@
             </div>
 
             <div class="row">
-                <div class="col-7">
+                <div id="profession" class="col-7">
                     <span class="info">
-                        Profession(s): {{PROFESSION}}
+                        Profession(s): <span id="profession-list">{{PROFESSION}}</span>
                     </span>
                 </div>
             </div>

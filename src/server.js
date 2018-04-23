@@ -18,7 +18,7 @@ var posters   = require('./imdb_poster');
 var app = express();
 var port = 8018;
 var public_dir = path.join(__dirname, '../WebContent/public');
-
+var professions_list = null;
 
 // simple replace all function to add simplicity
 // https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
@@ -36,7 +36,7 @@ String.prototype.nameNotation = function(){
 
 function initServer(){
     database.init(path.join(__dirname, '..', 'imdb.sqlite3'));
-    
+    loadProfessionList();
     console.log('Now listening on port: ' + port);
     app.listen(port);
 }
@@ -94,15 +94,6 @@ app.post('/search', (req, res) =>{
                             // successfully created template
                             page = page.replaceAll('{{SEARCH}}', search);
 
-                            var keys;
-                            
-                            if (fields.type[0] === 'Names') {
-                                keys = ['primary_name', 'primary_profession', 'death_year', 'birth_year'];
-                            }
-                            else if (fields.type[0] === 'Titles') {
-                                keys = ['primary_title', 'start_year', 'title_type', 'end_year'];
-                            }
-
                             fs.readFile(path.join(public_dir, 'html', fields.type[0] + '_item.html'), (err, data) =>{
                                 if(err){returnErrorMessage(res, 404, 'Cannot load template')}
                                 else{
@@ -148,7 +139,9 @@ app.post('/search', (req, res) =>{
 
 
 app.put('/Names/:nconst', (req, res) =>{
-   console.log(req.body);
+    console.log('Req: PUT /Names/:nconst');
+
+    console.log(req.body);
 
     //respond to request
     res.writeHead(200, {'Content-Type': 'text/plain'});
@@ -156,6 +149,12 @@ app.put('/Names/:nconst', (req, res) =>{
     res.end();
 });
 
+app.get('/Names/professions', (req, res) => {
+    //respond to request
+    res.writeHead(200, {'Content-Type': 'text/plain'});
+    res.write(JSON.stringify(professions_list));
+    res.end();
+});
 
 // people
 app.get('/Names/:nconst', (req, res) => {
@@ -254,13 +253,13 @@ app.get('/Titles/:tconst', (req, res) =>{
                 if(err){returnErrorMessage(res, 404, 'Unable to find file')}
                 else {
                     // successfully created template
-                    page = page.replaceAll('{{TITLE}}',        results[0].primary_title);
-                    page = page.replaceAll('{{YEAR}}',   results[0].start_year + (results[0].end_year === null ? '' : '-' +results[0].end_year));
-                    page = page.replaceAll('{{TYPE}}',         results[0].type || 'Unknown');
-                    page = page.replaceAll('{{RUN_TIME}}',     results[0].runtime_minutes);
-                    page = page.replaceAll('{{GENRES}}',       results[0].genres.replaceAll(',', ', '));
-                    page = page.replaceAll('{{RATING}}',       results[0].average_rating);
-                    page = page.replaceAll('{{VOTES}}',        results[0].num_votes);
+                    page = page.replaceAll('{{TITLE}}',     results[0].primary_title);
+                    page = page.replaceAll('{{YEAR}}',      results[0].start_year + (results[0].end_year === null ? '' : '-' +results[0].end_year));
+                    page = page.replaceAll('{{TYPE}}',      results[0].title_type !== null ? results[0].title_type.nameNotation() : 'Unknown');
+                    page = page.replaceAll('{{RUN_TIME}}',  results[0].runtime_minutes);
+                    page = page.replaceAll('{{GENRES}}',    results[0].genres.replaceAll(',', ', '));
+                    page = page.replaceAll('{{RATING}}',    results[0].average_rating);
+                    page = page.replaceAll('{{VOTES}}',     results[0].num_votes);
                     page = page.replaceAll('{{POSTER_ID}}', req.params.tconst);
 					page = page.replaceAll('{{CAST}}', () => {
 						var list = '';
@@ -329,6 +328,29 @@ initServer();
 
 
 /********************************   Utility Functions   *****************************/
+
+function loadProfessionList(){
+    database.select('select_professions', undefined, (err, results) => {
+        var i;
+        var j;
+        var data = {};
+        var temp;
+        var list = '';
+
+        for(i=0; i<results.length; i++){
+            temp = results[i].primary_profession.split(',');
+            for(j=0; j<temp.length; j++){
+                if(!list.includes(temp[j])) {
+                    list += temp[j] + ',';
+                }
+            }
+        }
+
+        data.list = list.substring(0, list.length - 1);
+        data.list = data.list.replaceAll('_', ' ');
+        professions_list = data;
+    });
+}
 
 function getFile(file, callback){
     fs.readFile(file, callback);
