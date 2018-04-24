@@ -14,20 +14,25 @@ function init(){
 }
 
 function startEdit(){
-    $.get('/Names/professions', function( data ) {
-        var editButton      = $('#edit-button');
-        var cancelButton    = $('#cancel-button');
+    $.get('/list/professions', function( data ) {
+        openEdit();
+
         var profession      = $('#profession');
         var year            = $('#year');
         var i;
+        var temp;
 
-        var temp = year.html().trim().split('-');
+        //change year
+        temp = year.html().trim().split('-');
         var birth_year = temp[0].substring(1);
         var death_year = temp[1].substring(0, temp[1].length - 1);
+        year.html('(<input id="birth-year" class="year-input" type="text" value="' + birth_year + '"/>-<input id="death-year" class="year-input" type="text" value="' + death_year + '"/>)');
+
+
+
         var professionList;
         var list = JSON.parse(data).list.split(',');
 
-        year.html('(<input id="birth-year" class="year-input" type="text" value="' + birth_year + '"/>-<input id="death-year" class="year-input" type="text" value="' + death_year + '"/>)');
         temp = $('#profession-list').html().split('/');
 
         /* chnage to multiple select */
@@ -46,14 +51,6 @@ function startEdit(){
         for(i=0; i<temp.length; i++) {
             $('#profession-select option[value="' + temp[i].trim().toLowerCase() + '"]').prop("selected", true);
         }
-
-
-
-        cancelButton.css('visibility', 'visible');
-        editButton.html('Save');
-        editButton.removeClass('btn-default');
-        editButton.addClass('btn-success');
-        editButton.attr("onclick","saveEdit()");
     });
 }
 
@@ -72,7 +69,7 @@ function saveEdit(){
     data.death_year = death_year.val();
 
         $.ajax({
-            url: '/Names/' + $('#poster').attr('name'),
+            url: '/Titles/' + $('#poster').attr('name'),
             type: 'PUT',
             contentType: 'application/json',
             data: JSON.stringify(data),
@@ -86,24 +83,7 @@ function saveEdit(){
 }
 
 
-function cancelEdit(){
-    exitEdit();
-}
 
-function exitEdit(){
-    var editButton      = $('#edit-button');
-    var cancelButton    = $('#cancel-button');
-
-    cancelButton.css('visibility', 'hidden');
-
-
-    editButton.html('Edit');
-    editButton.removeClass('btn-success');
-    editButton.addClass('btn-default');
-    editButton.attr("onclick","startEdit()");
-
-    location.reload(true);
-}
 
 
 
