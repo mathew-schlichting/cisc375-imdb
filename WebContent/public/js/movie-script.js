@@ -64,11 +64,11 @@ function saveEdit(){
     });
 
     data = {};
-    data.professions = genres;
+    data.genres = genres;
     data.type = type.find(':selected').val();
 
         $.ajax({
-            url: '/Names/' + $('#poster').attr('name'),
+            url: '/Titles/' + $('#poster').attr('name'),
             type: 'PUT',
             contentType: 'application/json',
             data: JSON.stringify(data),
