@@ -159,6 +159,36 @@ app.get('/Names/professions', (req, res) => {
 // people
 app.get('/Names/:nconst', (req, res) => {
     console.log('Req: GET /Names/:nconst');
+	var html = '';
+	database.select('select_person_by_id', req.params.nconst, (err, results) => {
+		if(err){returnErrorMessage(res,500,err);}
+		var knownTitles = results[0].known_for_titles.split(',');
+		var template;
+		if(knownTitles!==null){
+			fs.readFile(path.join(public_dir, 'html', 'Titles_item.html'), (err, data) => {
+				if(err){returnErrorMessage(res,404,'Cannot load template')}
+				else{
+					for(i=0;i<knownTitles.length;i++){
+						database.select('select_movie_by_id',knownTitles[i], (err, res) => {
+							if(err){returnErrorMessage(res,500,err)}
+							else{
+								if(res[0]!==undefined){
+									template = '' + data;
+									template = template.replaceAll('{{TITLE}}',res[0].primary_title);
+									template = template.replaceAll('{{YEAR}}','(' + res[0].start_year + (res[0].end_year===null ? '' : '-' +  res[0].end_year) + ')');
+									template = template.replaceAll('{{TYPE}}', res[0].title_type !== null ? res[0].title_type.nameNotation() : 'Unknown');
+									template = template.replaceAll('{{LINK}}', '/Titles/' + res[0].id);
+									html+=template;
+								}
+							}
+						
+						});
+					}
+				}
+			});
+		}						                        
+	});
+	
 
     database.select('select_person_by_id', req.params.nconst, (err, results) => {
         if(err){returnErrorMessage(res, 500, err);}
@@ -172,18 +202,19 @@ app.get('/Names/:nconst', (req, res) => {
                     page = page.replaceAll('{{NAME}}', results[0].primary_name);
                     page = page.replaceAll('{{YEAR}}', results[0].birth_year + '-' + (results[0].death_year === null ? 'Present' : results[0].death_year));
                     page = page.replaceAll('{{PROFESSION}}', formatProfessions(results[0].primary_profession));
-                    page = page.replaceAll('{{KNOWN_FOR_TITLES}}', results[0].known_for_titles);
-                    page = page.replaceAll('{{POSTER_ID}}', req.params.nconst);
+					page = page.replaceAll('{{KNOWN_FOR_TITLES}}', html);
+					
+					page = page.replaceAll('{{POSTER_ID}}', req.params.nconst);
+				
+              	 //respond to request
+              	res.writeHead(200, {'Content-Type': 'text/html'});
+                res.write(page);
+				res.end();
 
-                    //respond to request
-                    res.writeHead(200, {'Content-Type': 'text/html'});
-                    res.write(page);
-                    res.end();
-
-                }
-            });
-        }
-        else{returnErrorMessage(res, 404, 'Person not found');}
+				}
+			});
+		}
+   		 else{returnErrorMessage(res, 404, 'Person not found');}
     });
 });
 
@@ -244,12 +275,29 @@ app.get('/Titles/:tconst', (req, res) =>{
 			}
 		}
 	});
+
     database.select('select_movie_by_id', req.params.tconst, (err, results) => {
         if(err){returnErrorMessage(res, 500, err);}
         else if(results.length === 1){
             // successfully obtained data from database
-
-            readyTemplate('movie_template.html', results[0].primary_title, (err, page) => {
+			var html = '';
+			var template;
+			if(cast!==null){
+				fs.readFile(path.join(public_dir, 'html', 'Names_item.html'), (err, data) => {
+					if(err){returnErrorMessage(res,404,'Cannot load template')}
+					else{
+						for(i=0;i<cast.length;i++){
+							template = '' + data;
+							template = template.replaceAll('{{NAME}}', cast[i].primary_name);
+							template = template.replaceAll('{{YEAR}}', cast[i].category);
+							template = template.replaceAll('{{PROFESSION}}', cast[i].characters !== null ? cast[i].characters : '');
+							template = template.replaceAll('{{LINK}}', '/Names/' + cast[i].id);
+							html+=template;
+						}
+					}
+				});
+			}    
+		readyTemplate('movie_template.html', results[0].primary_title, (err, page) => {
                 if(err){returnErrorMessage(res, 404, 'Unable to find file')}
                 else {
                     // successfully created template
@@ -261,14 +309,7 @@ app.get('/Titles/:tconst', (req, res) =>{
                     page = page.replaceAll('{{RATING}}',    results[0].average_rating);
                     page = page.replaceAll('{{VOTES}}',     results[0].num_votes);
                     page = page.replaceAll('{{POSTER_ID}}', req.params.tconst);
-					page = page.replaceAll('{{CAST}}', () => {
-						var list = '';
-						for(var i =0;i<cast.length;i++){
-							var person = cast[i];
-							list = list + person.primary_name + ', '+person.category+', ' +person.characters + '. \n';
-						}
-						return list;	
-					});
+					page = page.replaceAll('{{CAST}}',html);
 
                     //respond to request
                     res.writeHead(200, {'Content-Type': 'text/html'});

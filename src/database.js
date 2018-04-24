@@ -10,7 +10,7 @@ connection.query = {
 	// people
 	select_Names: 'SELECT nconst AS id, primary_name, birth_year, death_year, primary_profession FROM Names WHERE primary_name = ? COLLATE NOCASE',
 	select_Names_wild: 'SELECT nconst AS id, primary_name, birth_year, death_year, primary_profession FROM Names WHERE primary_name LIKE ? COLLATE NOCASE',
-	select_person_by_id: 'SELECT primary_name, birth_year, death_year, primary_profession, known_for_titles FROM Names WHERE nconst = ?',
+	select_person_by_id: 'SELECT nconst AS id, primary_name, birth_year, death_year, primary_profession, known_for_titles FROM Names WHERE nconst = ?',
 	update_person_by_id: 'UPDATE Names SET birth_year = ?, death_year = ?, primary_profession = ? WHERE nconst = ?',
 	select_person_filter: 'SELECT primary_name, birth_year, death_year, primary_profession, known_for_titles FROM Names WHERE primary_name LIKE ? AND primary_profession LIKE ? COLLATE NOCASE',
     select_professions: 'SELECT primary_profession FROM Names',
@@ -19,7 +19,7 @@ connection.query = {
     // movies
 	select_Titles: 'SELECT tconst AS id, primary_title, title_type, start_year, end_year FROM Titles WHERE primary_title = ? COLLATE NOCASE',
 	select_Titles_wild: 'SELECT tconst AS id, primary_title, title_type, start_year, end_year FROM Titles WHERE primary_title LIKE ? COLLATE NOCASE',
-    select_movie_by_id: 'SELECT primary_title, title_type, start_year, end_year, runtime_minutes, genres, average_rating, num_votes FROM Titles LEFT JOIN Ratings ON Ratings.tconst = Titles.tconst WHERE Titles.tconst = ?',
+    select_movie_by_id: 'SELECT Titles.tconst AS id, primary_title, title_type, start_year, end_year, runtime_minutes, genres, average_rating, num_votes FROM Titles LEFT JOIN Ratings ON Ratings.tconst = Titles.tconst WHERE Titles.tconst = ?',
 	select_cast: 'SELECT Principals.nconst AS id, primary_name, category, characters FROM Principals INNER JOIN Names ON Principals.nconst = Names.nconst WHERE tconst = ? ORDER BY ordering',
 	select_crew: 'SELECT directors,writers FROM Crew WHERE tconst = ?',
 	update_title_by_id: 'UPDATE Titles SET genres = ?, title_type = ? WHERE tconst = ?',
