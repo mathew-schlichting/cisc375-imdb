@@ -47,9 +47,7 @@
     padding: 2em;
 
     background-image: url("../images/film.jpg");
-    -webkit-background-size: cover;
-    background-size: cover;
-    background-repeat: repeat-y;
+    background-repeat: repeat;
 }
 
 
