@@ -364,7 +364,7 @@ app.get('/Titles/:tconst', (req, res) =>{
                     page = page.replaceAll('{{YEAR}}',      results[0].start_year + (results[0].end_year === null ? '' : '-' +results[0].end_year));
                     page = page.replaceAll('{{TYPE}}',      results[0].title_type !== null ? results[0].title_type.nameNotation() : 'Unknown');
                     page = page.replaceAll('{{RUN_TIME}}',  results[0].runtime_minutes);
-                    page = page.replaceAll('{{GENRES}}',    results[0].genres.replaceAll(',', ', '));
+                    page = page.replaceAll('{{GENRES}}',    results[0].genres !== null ? results[0].genres.replaceAll(',', ', ') : 'Unknown');
                     page = page.replaceAll('{{RATING}}',    results[0].average_rating);
                     page = page.replaceAll('{{VOTES}}',     results[0].num_votes);
                     page = page.replaceAll('{{POSTER_ID}}', req.params.tconst);
