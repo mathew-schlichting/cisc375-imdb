@@ -143,7 +143,10 @@ app.post('/search', (req, res) =>{
 
 app.put('/Names/:nconst', (req, res) =>{
     console.log('Req: PUT /Names/:nconst');
+	database.update('update_title_by_id',req.params.nconst,req.body,(err,results) => {
+		if(err){returnErrorMessage(res,500,err);}
 
+	});
     console.log(req.body);
 
     //respond to request
@@ -154,7 +157,9 @@ app.put('/Names/:nconst', (req, res) =>{
 
 app.put('/Titles/:nconst', (req, res) =>{
     console.log('Req: PUT /Names/:nconst');
-
+	database.update('update_person_by_id',req.params.nconst,req.body, (err, results) => {
+		if(err){returnErrorMessage(res,500,err);}
+	});
     console.log(req.body);
 
     //respond to request
