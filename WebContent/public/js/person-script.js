@@ -11,6 +11,22 @@ function init(){
             e.attr('src', data.src);
         }
     });
+
+    var list = $('img');
+    for(var i=0;i<list.length;i++){
+        if(list[i].id !== 'poster'){
+            loadPoster(list[i].id);
+        }
+    }
+}
+
+function loadPoster(id){
+    $.get('/poster/Titles/' + id.split('-')[1], function( data ) {
+        data = JSON.parse(data);
+        if(data.src) {
+            $('#'+id).attr('src', data.src);
+        }
+    });
 }
 
 function startEdit(){
@@ -69,7 +85,7 @@ function saveEdit(){
     data.death_year = death_year.val();
 
         $.ajax({
-            url: '/Titles/' + $('#poster').attr('name'),
+            url: '/Names/' + $('#poster').attr('name'),
             type: 'PUT',
             contentType: 'application/json',
             data: JSON.stringify(data),

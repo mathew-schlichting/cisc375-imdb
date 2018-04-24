@@ -10,9 +10,11 @@ function updateOptions(){
     var list = data[selection];
     var i;
     var result = '';
+    result += '<option value="all">All</option>';
     for(i=0;i<list.length;i++){
             result += '<option value="' + list[i] + '">' + list[i] +'</option>';
     }
+
 
     $('#filter').html(result);
 }

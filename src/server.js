@@ -108,19 +108,31 @@ app.post('/search', (req, res) =>{
 
                                     html = '';
                                     for(i=0; i<results.length; i++){
+                                        //filter
+                                        if (fields.type[0] === 'Names') {
+
+                                        }
+                                        else if (fields.type[0] === 'Titles') {
+
+                                        }
+
+                                        
                                         template = '' + data;
 
                                         if (fields.type[0] === 'Names') {
                                             template = template.replaceAll('{{NAME}}', results[i].primary_name);
                                             template = template.replaceAll('{{YEAR}}', '(' + results[i].birth_year + '-' + (results[i].death_year === null ? 'Present' : results[i].death_year) + ')');
                                             template = template.replaceAll('{{PROFESSION}}', results[i].primary_profession !== null ? formatProfessions(results[i].primary_profession) : 'Unknown');
+                                            template = template.replaceAll('{{ID}}', 'Names-' + results[i].id);
                                         }
                                         else if (fields.type[0] === 'Titles') {
                                             template = template.replaceAll('{{TITLE}}', results[i].primary_title);
                                             template = template.replaceAll('{{YEAR}}', '(' + results[i].start_year + (results[i].end_year === null ? '' : '-' + results[i].end_year) + ')');
                                             template = template.replaceAll('{{TYPE}}', results[i].title_type !== null ? results[i].title_type.nameNotation() : 'Unknown');
+                                            template = template.replaceAll('{{ID}}', 'Titles-' + results[i].id);
                                         }
 
+                                        template = template.replaceAll('{{ID}}', results[i].id);
                                         template = template.replaceAll('{{LINK}}', '/' + fields.type[0] + '/' + results[i].id);
 
 
@@ -145,7 +157,7 @@ app.post('/search', (req, res) =>{
     });
 });
 
-
+// names wiki
 app.put('/Names/:nconst', (req, res) =>{
     console.log('Req: PUT /Names/:nconst');
 	database.update('update_title_by_id',req.params.nconst,req.body,(err,results) => {
@@ -160,6 +172,7 @@ app.put('/Names/:nconst', (req, res) =>{
     res.end();
 });
 
+//titles wiki
 app.put('/Titles/:nconst', (req, res) =>{
     console.log('Req: PUT /Names/:nconst');
 	database.update('update_person_by_id',req.params.nconst,req.body, (err, results) => {
@@ -173,6 +186,7 @@ app.put('/Titles/:nconst', (req, res) =>{
     res.end();
 });
 
+//get a list
 app.get('/list/:type', (req, res) => {
 
     //respond to request
@@ -243,7 +257,6 @@ app.get('/Names/:nconst', (req, res) => {
    		 else{returnErrorMessage(res, 404, 'Person not found');}
     });
 });
-
 
 // movie titles
 app.get('/Titles/:tconst', (req, res) =>{
@@ -318,7 +331,9 @@ app.get('/Titles/:tconst', (req, res) =>{
 							template = template.replaceAll('{{YEAR}}', cast[i].category);
 							template = template.replaceAll('{{PROFESSION}}', cast[i].characters !== null ? cast[i].characters : '');
 							template = template.replaceAll('{{LINK}}', '/Names/' + cast[i].id);
-							html+=template;
+                            template = template.replaceAll('{{ID}}', cast[i].id);
+
+                            html+=template;
 						}
 					}
 				});
