@@ -31,6 +31,15 @@ String.prototype.nameNotation = function(){
     s = s.charAt(0).toUpperCase() + s.substr(1);
     return s;
 };
+String.prototype.filterFormat = function(){
+    var s = this;
+    s = s.toLowerCase();
+    s = s.replaceAll('-', '');
+    s = s.replaceAll('/', '');
+    s = s.replaceAll('_', '');
+    s = s.replaceAll(' ', '');
+    return s;
+};
 
 
 
@@ -105,41 +114,50 @@ app.post('/search', (req, res) =>{
                             fs.readFile(path.join(public_dir, 'html', fields.type[0] + '_item.html'), (err, data) =>{
                                 if(err){returnErrorMessage(res, 404, 'Cannot load template')}
                                 else{
-
                                     html = '';
+
                                     for(i=0; i<results.length; i++){
                                         //filter
-                                        if (fields.type[0] === 'Names') {
-
-                                        }
-                                        else if (fields.type[0] === 'Titles') {
-
-                                        }
-
-                                        
-                                        template = '' + data;
+                                        var addToList = false;
 
                                         if (fields.type[0] === 'Names') {
-                                            template = template.replaceAll('{{NAME}}', results[i].primary_name);
-                                            template = template.replaceAll('{{YEAR}}', '(' + results[i].birth_year + '-' + (results[i].death_year === null ? 'Present' : results[i].death_year) + ')');
-                                            template = template.replaceAll('{{PROFESSION}}', results[i].primary_profession !== null ? formatProfessions(results[i].primary_profession) : 'Unknown');
-                                            template = template.replaceAll('{{ID}}', 'Names-' + results[i].id);
+                                            if(fields.filter[0].filterFormat() === 'all' || results[i].primary_profession.filterFormat().includes(fields.filter[0].filterFormat())){
+                                                addToList = true;
+                                            }
                                         }
                                         else if (fields.type[0] === 'Titles') {
-                                            template = template.replaceAll('{{TITLE}}', results[i].primary_title);
-                                            template = template.replaceAll('{{YEAR}}', '(' + results[i].start_year + (results[i].end_year === null ? '' : '-' + results[i].end_year) + ')');
-                                            template = template.replaceAll('{{TYPE}}', results[i].title_type !== null ? results[i].title_type.nameNotation() : 'Unknown');
-                                            template = template.replaceAll('{{ID}}', 'Titles-' + results[i].id);
+                                            if(fields.filter[0].filterFormat() === 'all' || results[i].title_type.filterFormat().includes(fields.filter[0].filterFormat())){
+                                                addToList = true;
+                                            }
                                         }
 
-                                        template = template.replaceAll('{{ID}}', results[i].id);
-                                        template = template.replaceAll('{{LINK}}', '/' + fields.type[0] + '/' + results[i].id);
+                                        if(addToList) {
 
 
-                                        html += template;
+                                            template = '' + data;
+
+                                            if (fields.type[0] === 'Names') {
+                                                template = template.replaceAll('{{NAME}}', results[i].primary_name);
+                                                template = template.replaceAll('{{YEAR}}', '(' + results[i].birth_year + '-' + (results[i].death_year === null ? 'Present' : results[i].death_year) + ')');
+                                                template = template.replaceAll('{{PROFESSION}}', results[i].primary_profession !== null ? formatProfessions(results[i].primary_profession) : 'Unknown');
+                                                template = template.replaceAll('{{ID}}', 'Names-' + results[i].id);
+                                            }
+                                            else if (fields.type[0] === 'Titles') {
+                                                template = template.replaceAll('{{TITLE}}', results[i].primary_title);
+                                                template = template.replaceAll('{{YEAR}}', '(' + results[i].start_year + (results[i].end_year === null ? '' : '-' + results[i].end_year) + ')');
+                                                template = template.replaceAll('{{TYPE}}', results[i].title_type !== null ? results[i].title_type.nameNotation() : 'Unknown');
+                                                template = template.replaceAll('{{ID}}', 'Titles-' + results[i].id);
+                                            }
+
+                                            template = template.replaceAll('{{ID}}', results[i].id);
+                                            template = template.replaceAll('{{LINK}}', '/' + fields.type[0] + '/' + results[i].id);
+
+
+                                            html += template;
+                                        }
                                     }
 
-                                        page = page.replaceAll('{{RESULTS}}', html);
+                                    page = page.replaceAll('{{RESULTS}}', html);
 
                                     //respond to request
                                     res.writeHead(200, {'Content-Type': 'text/html'});
@@ -431,6 +449,7 @@ function loadProfessionList(){
         data.list = list.substring(0, list.length - 1);
         data.list = data.list.replaceAll('_', ' ');
         preloaded_lists.professions = data;
+        console.log('Loaded profession list');
     });
 }
 
@@ -456,6 +475,7 @@ function loadGenreList(){
         data.list = list.substring(0, list.length - 1);
         data.list = data.list.replaceAll('_', ' ');
         preloaded_lists.genres = data;
+        console.log('Loaded genre list');
     });
 }
 
@@ -476,6 +496,7 @@ function loadTypeList(){
         data.list = list.substring(0, list.length - 1);
         data.list = data.list.replaceAll('_', ' ');
         preloaded_lists.types = data;
+        console.log('Loaded type list');
     });
 }
 
