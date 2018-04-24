@@ -85,6 +85,7 @@ app.post('/search', (req, res) =>{
     form.parse(req, (err, fields, files) => {
         if(err){returnErrorMessage(res, 500, 'Internal Server Error!');}
         else{
+
             // successfully obtained search params from browser
 			search = fields.search[0];
 			search = search.replace(/\;/g,'');
@@ -202,7 +203,8 @@ app.get('/Names/:nconst', (req, res) => {
 									template = template.replaceAll('{{YEAR}}','(' + res[0].start_year + (res[0].end_year===null ? '' : '-' +  res[0].end_year) + ')');
 									template = template.replaceAll('{{TYPE}}', res[0].title_type !== null ? res[0].title_type.nameNotation() : 'Unknown');
 									template = template.replaceAll('{{LINK}}', '/Titles/' + res[0].id);
-									html+=template;
+									template = template.replaceAll('{{ID}}', res[0].id);
+                                    html+=template;
 								}
 							}
 						
@@ -495,6 +497,9 @@ function readyTemplate(page, title, callback){
 }
 
 function formatProfessions(p){
+    if(p === null){
+        p = 'Unknown';
+    }
     var s = p.split(',');
     var result = '';
     for(var i=0; i<s.length; i++){

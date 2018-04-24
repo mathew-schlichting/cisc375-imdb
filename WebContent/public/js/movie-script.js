@@ -11,6 +11,9 @@ function init(){
             e.attr('src', data.src);
         }
     });
+    
+    
+    
 }
 
 function startEdit(){
