@@ -65,6 +65,10 @@ app.get('/', (req, res) => {
     console.log('Req: /');
     res.sendFile(path.join(public_dir, 'index.html'));
 });
+app.get('/about', (req, res) => {
+    console.log('Req: /');
+    res.sendFile(path.join(public_dir, 'html', 'about-the-project.html'));
+});
 
 
 
