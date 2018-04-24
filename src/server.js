@@ -510,7 +510,6 @@ function returnErrorMessage(res, code, message){
     res.end()
 }
 
-
 function readyTemplate(page, title, callback){
     var template_location = path.join(public_dir, 'html');
     var result;
