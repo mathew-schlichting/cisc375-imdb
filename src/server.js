@@ -53,11 +53,8 @@ function initServer(){
     app.listen(port);
 }
 
+//use body parser for put requests
 app.use(bodyParser.json());
-
-
-
-
 
 // static files
 app.use('/js',express.static(path.join(public_dir, 'js')));
@@ -69,16 +66,15 @@ app.use(favicon(path.join(public_dir, 'images', 'favicon.ico')));
 
 
 // home page should be static
-
 app.get('/', (req, res) => {
     console.log('Req: /');
     res.sendFile(path.join(public_dir, 'index.html'));
 });
+// about the project page should be static
 app.get('/about', (req, res) => {
     console.log('Req: /');
     res.sendFile(path.join(public_dir, 'html', 'about-the-project.html'));
 });
-
 
 
 // search
@@ -217,63 +213,64 @@ app.get('/list/:type', (req, res) => {
 app.get('/Names/:nconst', (req, res) => {
     console.log('Req: GET /Names/:nconst');
 	var html = '';
+    var i;
+
 	database.select('select_person_by_id', req.params.nconst, (err, results) => {
 		if(err){returnErrorMessage(res,500,err);}
-		var knownTitles = results[0].known_for_titles.split(',');
-		var template;
-		if(knownTitles!==null){
-			fs.readFile(path.join(public_dir, 'html', 'Titles_item.html'), (err, data) => {
-				if(err){returnErrorMessage(res,404,'Cannot load template')}
-				else{
-					for(i=0;i<knownTitles.length;i++){
-						database.select('select_movie_by_id',knownTitles[i], (err, res) => {
-							if(err){returnErrorMessage(res,500,err)}
-							else{
-								if(res[0]!==undefined){
-									template = '' + data;
-									template = template.replaceAll('{{TITLE}}',res[0].primary_title);
-									template = template.replaceAll('{{YEAR}}','(' + res[0].start_year + (res[0].end_year===null ? '' : '-' +  res[0].end_year) + ')');
-									template = template.replaceAll('{{TYPE}}', res[0].title_type !== null ? res[0].title_type.nameNotation() : 'Unknown');
-									template = template.replaceAll('{{LINK}}', '/Titles/' + res[0].id);
-									template = template.replaceAll('{{ID}}', res[0].id);
-                                    html+=template;
-								}
-							}
-						
-						});
-					}
-				}
-			});
-		}						                        
+        else {
+            var knownTitles = results[0].known_for_titles.split(',');
+            var template;
+            if (knownTitles !== null) {
+                fs.readFile(path.join(public_dir, 'html', 'Titles_item.html'), (err, data) => {
+                    if (err) {returnErrorMessage(res, 404, 'Cannot load template')}
+                    else {
+                        var promise = new Promise((resolve, reject) =>{
+                            for (i = 0; i < knownTitles.length; i++) {
+                                database.select('select_movie_by_id', knownTitles[i], (err, res) => {
+                                    if (err) {returnErrorMessage(res, 500, err);}
+                                    else {
+                                        if (res[0] !== undefined) {
+                                            template = '' + data;
+                                            template = template.replaceAll('{{TITLE}}', res[0].primary_title);
+                                            template = template.replaceAll('{{YEAR}}', '(' + res[0].start_year + (res[0].end_year === null ? '' : '-' + res[0].end_year) + ')');
+                                            template = template.replaceAll('{{TYPE}}', res[0].title_type !== null ? res[0].title_type.nameNotation() : 'Unknown');
+                                            template = template.replaceAll('{{LINK}}', '/Titles/' + res[0].id);
+                                            template = template.replaceAll('{{ID}}', res[0].id);
+                                            html += template;
+                                        }
+                                    }
+
+                                });
+                                if(i+1 === knownTitles.length) {
+                                    resolve('success');
+                                }
+                            }
+                        });
+                        promise.then((data) => {
+                            readyTemplate('person_template.html', results[0].primary_name, (err, page) => {
+                                if(err){returnErrorMessage(res, 404, 'Unable to find file')}
+                                else {
+                                    // successfully created template
+                                    page = page.replaceAll('{{NAME}}', results[0].primary_name);
+                                    page = page.replaceAll('{{YEAR}}', results[0].birth_year + '-' + (results[0].death_year === null ? 'Present' : results[0].death_year));
+                                    page = page.replaceAll('{{PROFESSION}}', formatProfessions(results[0].primary_profession));
+                                    page = page.replaceAll('{{KNOWN_FOR_TITLES}}', html);
+
+                                    page = page.replaceAll('{{POSTER_ID}}', req.params.nconst);
+
+                                    //respond to request
+                                    res.writeHead(200, {'Content-Type': 'text/html'});
+                                    res.write(page);
+                                    res.end();
+
+                                }
+                            });
+                        });
+                    }
+                });
+            }
+        }
 	});
-	
-
-    database.select('select_person_by_id', req.params.nconst, (err, results) => {
-        if(err){returnErrorMessage(res, 500, err);}
-        else if(results.length === 1){
-            // successfully obtained data from database
-
-            readyTemplate('person_template.html', results[0].primary_name, (err, page) => {
-                if(err){returnErrorMessage(res, 404, 'Unable to find file')}
-                else {
-                    // successfully created template
-                    page = page.replaceAll('{{NAME}}', results[0].primary_name);
-                    page = page.replaceAll('{{YEAR}}', results[0].birth_year + '-' + (results[0].death_year === null ? 'Present' : results[0].death_year));
-                    page = page.replaceAll('{{PROFESSION}}', formatProfessions(results[0].primary_profession));
-					page = page.replaceAll('{{KNOWN_FOR_TITLES}}', html);
-					
-					page = page.replaceAll('{{POSTER_ID}}', req.params.nconst);
-				
-              	 //respond to request
-              	res.writeHead(200, {'Content-Type': 'text/html'});
-                res.write(page);
-				res.end();
-
-				}
-			});
-		}
-   		 else{returnErrorMessage(res, 404, 'Person not found');}
-    });
 });
 
 // movie titles
@@ -347,7 +344,7 @@ app.get('/Titles/:tconst', (req, res) =>{
 							template = '' + data;
 							template = template.replaceAll('{{NAME}}', cast[i].primary_name);
 							template = template.replaceAll('{{YEAR}}', cast[i].category);
-							template = template.replaceAll('{{PROFESSION}}', cast[i].characters !== null ? cast[i].characters : '');
+							template = template.replaceAll('{{PROFESSION}}', cast[i].characters !== null ? formatCharacters(cast[i].characters) : '');
 							template = template.replaceAll('{{LINK}}', '/Names/' + cast[i].id);
                             template = template.replaceAll('{{ID}}', cast[i].id);
 
@@ -410,13 +407,6 @@ app.get('/poster/:type/:tconst', (req, res) => {
 
 
 initServer();
-
-
-
-
-
-
-
 
 
 
@@ -542,6 +532,18 @@ function formatProfessions(p){
         result += s[i].nameNotation();
     }
     return result;
+}
+
+function formatCharacters(c){
+    var s = c.split(',');
+    
+    var result = '';
+    for(var i=0; i<s.length; i++){
+        if(i !== 0){result += ' / ';}
+        s[i] = s[i].replaceAll('\\[', '').replaceAll('"', '').replaceAll('\\]', '');
+        result += '"' + s[i].nameNotation() + '"';
+    }
+    return 'As: ' + result;
 }
 
 function yearRange(includePresent, start, end){

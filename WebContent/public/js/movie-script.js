@@ -66,10 +66,9 @@ function startEdit(){
         for(i=0; i<oldTypeList.length; i++) {
             $('#type-select option[value="' + oldTypeList[i].trim().toLowerCase() + '"]').prop("selected", true);
         }
-
-
-        
     });});
+    
+    $('.sortable').sortable();
 }
 
 function saveEdit(){

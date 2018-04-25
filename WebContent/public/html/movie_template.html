@@ -5,6 +5,11 @@
             <div class="poster-background padding-sm">
                 <img id="poster" name="{{POSTER_ID}}" src="/images/loading_poster.png" width="200px" height="300px"/>
             </div>
+            <div>
+                <span class="rating">
+                    Rating: {{RATING}}/10 Stars ({{VOTES}} votes)
+                </span>
+            </div>
         </div>
         <div class="col-9">
             <div class="row">
@@ -52,18 +57,16 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-9">
-					Cast: {{CAST}}
+                <div class="col-9 text-center">
+                    <h4>
+                        Cast:
+                    </h4>
+                    <ul class="list-group sortable">
+                        {{CAST}}
+                    </ul>
                 </div>
             </div>
 
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-3">
-            <span class="rating">
-                Rating: {{RATING}}/10 Stars ({{VOTES}} votes)
-            </span>
         </div>
     </div>
 </div>
