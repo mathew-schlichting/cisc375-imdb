@@ -187,17 +187,26 @@ app.put('/Names/:nconst', (req, res) =>{
 });
 
 //titles wiki
-app.put('/Titles/:nconst', (req, res) =>{
-    console.log('Req: PUT /Names/:nconst');
-	database.update('update_person_by_id',req.params.nconst,req.body, (err, results) => {
+app.put('/Titles/:tconst', (req, res) =>{
+    console.log('Req: PUT /Titles/:tconst');
+	database.update('update_person_by_id',req.params.tconst,req.body, (err, results) => {
 		if(err){returnErrorMessage(res,500,err);}
+        var data;
+        for(var i=0;i<req.body.cast.length;i++){
+            data = {};
+            data.id = req.body.cast[i];
+            data.order = i;
+            database.update('update_bill_order', req.params.tconst, data, (err, results) =>{
+                if(err){returnErrorMessage(res, 500, err);}
+               if(results === req.body.cast.length - 1){
+                   //respond to request
+                   res.writeHead(200, {'Content-Type': 'text/plain'});
+                   res.write('success');
+                   res.end();
+               }
+            });
+        }
 	});
-    console.log(req.body);
-
-    //respond to request
-    res.writeHead(200, {'Content-Type': 'text/plain'});
-    res.write('success');
-    res.end();
 });
 
 //get a list
@@ -536,7 +545,7 @@ function formatProfessions(p){
 
 function formatCharacters(c){
     var s = c.split(',');
-    
+
     var result = '';
     for(var i=0; i<s.length; i++){
         if(i !== 0){result += ' / ';}

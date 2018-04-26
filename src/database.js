@@ -42,28 +42,43 @@ connection.init = function (location){
 };
 
 connection.update = function (id, tnconst, params, callback){
+	var inputData;
+
 	if(id === 'update_title_by_id'){
-		var inputData = [params.genres, params.type, tnconst];
+		inputData = [params.genres, params.type, tnconst];
 		console.log('inputData: ' + inputData);
 		connection.db.run(connection.query[id], inputData, function(err,rows){
 			if(err){console.error(err.message);}
 			else{
 				console.log("updated: " + tnconst + " with " + params);
+				callback(undefined, 'success');
 			}
 		});
 	}else if(id === 'update_person_by_id'){
 		if(params.death_year === 'Present'){
 			params.death_year = '';
 		}
-		var inputData = [params.birth_year, params.death_year, params.primary_profession, tnconst];
+		inputData = [params.birth_year, params.death_year, params.primary_profession, tnconst];
 		console.log(inputData);
 		connection.db.run(connection.query[id], inputData, function(err,rows){
 			if(err){console.error(err.message);}
 			else{
 				console.log("updated: " + tnconst + " with " + params);
+				callback(undefined, 'success');
 			}
 		});
-	}else{
+	} else if(id === 'update_bill_order'){
+		inputData = [params.order, params.id, tnconst];
+
+		connection.db.run(connection.query[id], inputData, function(err,rows){
+			if(err){console.error(err.message);}
+			else{
+				console.log("updated: " + tnconst + " with " + params);
+				callback(undefined, params.order);
+			}
+		});
+		
+	} else{
 	console.log("wrong id given");
 	}	
 };
