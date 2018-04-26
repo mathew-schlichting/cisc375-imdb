@@ -90,12 +90,9 @@ function saveEdit(){
             contentType: 'application/json',
             data: JSON.stringify(data),
         success: (result) => {
-            console.log('test');
+            exitEdit();
         }
     });
-    
-
-    exitEdit();
 }
 
 

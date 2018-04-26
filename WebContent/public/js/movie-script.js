@@ -67,20 +67,28 @@ function startEdit(){
             $('#type-select option[value="' + oldTypeList[i].trim().toLowerCase() + '"]').prop("selected", true);
         }
     });});
-    
+
     $('.sortable').sortable();
 }
 
 function saveEdit(){
     var type      = $('#type');
     var genres = [];
+    var cast = [];
 
+    var castElements = $('.sortable').children();
+
+    for(var i=0;i<castElements.length;i++){
+        cast.push(castElements[i].id);
+    }
+    
     $('#genre-select  option:selected').each(function() {
         genres.push($(this).val());
     });
 
     data = {};
     data.genres = genres;
+    data.cast = cast;
     data.type = type.find(':selected').val();
 
         $.ajax({
@@ -89,12 +97,9 @@ function saveEdit(){
             contentType: 'application/json',
             data: JSON.stringify(data),
         success: (result) => {
-            console.log('test');
+            exitEdit();
         }
     });
-    
-
-    exitEdit();
 }
 
 
