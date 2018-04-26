@@ -174,22 +174,22 @@ app.post('/search', (req, res) =>{
 // names wiki
 app.put('/Names/:nconst', (req, res) =>{
     console.log('Req: PUT /Names/:nconst');
-	database.update('update_title_by_id',req.params.nconst,req.body,(err,results) => {
+	database.update('update_person_by_id',req.params.nconst,req.body,(err,results) => {
 		if(err){returnErrorMessage(res,500,err);}
-
+        res.writeHead(200, {'Content-Type': 'text/plain'});
+        res.write('success');
+        res.end();
 	});
-    console.log(req.body);
+    
 
     //respond to request
-    res.writeHead(200, {'Content-Type': 'text/plain'});
-    res.write('success');
-    res.end();
+
 });
 
 //titles wiki
 app.put('/Titles/:tconst', (req, res) =>{
     console.log('Req: PUT /Titles/:tconst');
-	database.update('update_person_by_id',req.params.tconst,req.body, (err, results) => {
+	database.update('update_title_by_id',req.params.tconst,req.body, (err, results) => {
 		if(err){returnErrorMessage(res,500,err);}
         var data;
         for(var i=0;i<req.body.cast.length;i++){
@@ -437,10 +437,12 @@ function loadProfessionList(){
         var list = '';
 
         for(i=0; i<results.length; i++){
-            temp = results[i].primary_profession.split(',');
-            for(j=0; j<temp.length; j++){
-                if(!list.includes(temp[j])) {
-                    list += temp[j] + ',';
+            if(results[i].primary_profession !== null) {
+                temp = results[i].primary_profession.split(',');
+                for (j = 0; j < temp.length; j++) {
+                    if (!list.includes(temp[j])) {
+                        list += temp[j] + ',';
+                    }
                 }
             }
         }

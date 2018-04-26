@@ -56,10 +56,15 @@ connection.update = function (id, tnconst, params, callback){
 		});
 	}else if(id === 'update_person_by_id'){
 		if(params.death_year === 'Present'){
-			params.death_year = '';
+			params.death_year = null;
 		}
-		inputData = [params.birth_year, params.death_year, params.primary_profession, tnconst];
-		console.log(inputData);
+		
+		var professions = '';
+		for(var i=0;i<params.professions.length;i++){
+			if(i > 0){professions+=',';}
+			professions += params.professions[i].trim();
+		}
+		inputData = [params.birth_year, params.death_year, professions, tnconst];
 		connection.db.run(connection.query[id], inputData, function(err,rows){
 			if(err){console.error(err.message);}
 			else{
