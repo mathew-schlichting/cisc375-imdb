@@ -35,6 +35,8 @@ function startEdit(){
     $.get('/list/types', (types_data) => {
         openEdit();
 
+
+        $('#cast-header').html('Drag and Drop to Reorder Cast');
         var i;
 
         // set genres

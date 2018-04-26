@@ -68,7 +68,7 @@ connection.update = function (id, tnconst, params, callback){
 			}
 		});
 	} else if(id === 'update_bill_order'){
-		inputData = [params.order, params.id, tnconst];
+		inputData = [params.order, tnconst, params.id];
 
 		connection.db.run(connection.query[id], inputData, function(err,rows){
 			if(err){console.error(err.message);}
