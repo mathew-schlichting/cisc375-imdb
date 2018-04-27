@@ -1,0 +1,10 @@
+This is a website developed by Mathew Schlichting and Ben Taufen. 
+We developed this software using JQuery and various node packages.
+
+To run:
+  Install all required node packages
+  Ensure the database is in the project folder at the same level as src/ and Webcontent/
+  Run "node src/server.js" to start the server
+  It will load necessary lists from the database and start listening
+  Wait until all lists are loaded in and the console displays 'Now listening at [port]'
+  Access the webserver from your browser and enjoy!
