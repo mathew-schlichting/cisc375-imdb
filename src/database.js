@@ -45,12 +45,16 @@ connection.update = function (id, tnconst, params, callback){
 	var inputData;
 
 	if(id === 'update_title_by_id'){
-		inputData = [params.genres, params.type, tnconst];
-		console.log('inputData: ' + inputData);
+		var genres = '';
+		for(var i=0;i<params.genres.length;i++){
+			if(i>0){genres+=',';}
+			genres += params.genres[i].trim();
+		}
+		inputData = [genres, params.type, tnconst];
 		connection.db.run(connection.query[id], inputData, function(err,rows){
 			if(err){console.error(err.message);}
 			else{
-				console.log("updated: " + tnconst + " with " + params);
+				console.log("updated: " + tnconst + " with " + inputData);
 				callback(undefined, 'success');
 			}
 		});
@@ -68,7 +72,7 @@ connection.update = function (id, tnconst, params, callback){
 		connection.db.run(connection.query[id], inputData, function(err,rows){
 			if(err){console.error(err.message);}
 			else{
-				console.log("updated: " + tnconst + " with " + params);
+				console.log("updated: " + tnconst + " with " + inputData);
 				callback(undefined, 'success');
 			}
 		});
