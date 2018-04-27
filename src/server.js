@@ -19,6 +19,7 @@ var app = express();
 var port = 8018;
 var public_dir = path.join(__dirname, '../WebContent/public');
 var preloaded_lists = {};
+var doneloading = false;
 
 // simple replace all function to add simplicity
 // https://stackoverflow.com/questions/1144783/how-to-replace-all-occurrences-of-a-string-in-javascript
@@ -45,12 +46,25 @@ String.prototype.filterFormat = function(){
 
 function initServer(){
     database.init(path.join(__dirname, '..', 'imdb.sqlite3'));
-    loadProfessionList();
-    loadGenreList();
-    loadTypeList();
     
-    console.log('Now listening on port: ' + port);
-    app.listen(port);
+    loadProfessionList(() =>{
+        if(preloaded_lists.genres !== undefined && preloaded_lists.professions !== undefined && preloaded_lists.types !== undefined){
+            console.log('Now listening on port: ' + port);
+            app.listen(port);
+        }
+    });
+    loadGenreList(() => {
+        if(preloaded_lists.genres !== undefined && preloaded_lists.professions !== undefined && preloaded_lists.types !== undefined){
+            console.log('Now listening on port: ' + port);
+            app.listen(port);
+        }
+    });
+    loadTypeList(() =>{
+        if(preloaded_lists.genres !== undefined && preloaded_lists.professions !== undefined && preloaded_lists.types !== undefined){
+            console.log('Now listening on port: ' + port);
+            app.listen(port);
+        }
+    });
 }
 
 //use body parser for put requests
@@ -399,7 +413,7 @@ app.get('/poster/:type/:tconst', (req, res) => {
     }
     
     getPoster(req.params.tconst, function (data) {
-        if(data.host !== null) {
+        if(data !== null && data.host !== null && data.path !== null) {
             result.src = 'http://' + data.host + data.path;
         }
         else{
@@ -428,7 +442,7 @@ initServer();
 
 /********************************   Utility Functions   *****************************/
 
-function loadProfessionList(){
+function loadProfessionList(callback){
     database.select('select_professions', undefined, (err, results) => {
         var i;
         var j;
@@ -451,10 +465,12 @@ function loadProfessionList(){
         data.list = data.list.replaceAll('_', ' ');
         preloaded_lists.professions = data;
         console.log('Loaded profession list');
+
+        callback();
     });
 }
 
-function loadGenreList(){
+function loadGenreList(callback){
     database.select('select_genres', undefined, (err, results) => {
         var i;
         var j;
@@ -477,10 +493,12 @@ function loadGenreList(){
         data.list = data.list.replaceAll('_', ' ');
         preloaded_lists.genres = data;
         console.log('Loaded genre list');
+
+        callback();
     });
 }
 
-function loadTypeList(){
+function loadTypeList(callback){
     database.select('select_types', undefined, (err, results) => {
         var i;
         var data = {};
@@ -498,6 +516,8 @@ function loadTypeList(){
         data.list = data.list.replaceAll('_', ' ');
         preloaded_lists.types = data;
         console.log('Loaded type list');
+
+        callback();
     });
 }
 
