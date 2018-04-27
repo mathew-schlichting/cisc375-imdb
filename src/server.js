@@ -333,14 +333,14 @@ app.get('/Titles/:tconst', (req, res) =>{
 			writers = results[0].writers.split(',');
 			for(var i = 0;i<writers.length;i++)
 				var wri = writers[i];{
-				var flag = 0;				     
+				var flag = 0;
 				for(person in cast){
 					if(wri === person.id){
 						flag = 1;
 					}
 				}
 				if(flag===0){
-					
+
 					database.select('select_person_by_id',wri,(err, per) => {
 						if(err){returnErrorMessage(res,500,err);}
 						if(per[0]!==undefined){
@@ -390,10 +390,13 @@ app.get('/Titles/:tconst', (req, res) =>{
                     page = page.replaceAll('{{POSTER_ID}}', req.params.tconst);
 					page = page.replaceAll('{{CAST}}',html);
 
-                    //respond to request
-                    res.writeHead(200, {'Content-Type': 'text/html'});
-                    res.write(page);
-                    res.end();
+                    setTimeout(()=>{
+                        //respond to request
+                        res.writeHead(200, {'Content-Type': 'text/html'});
+                        res.write(page);
+                        res.end();
+                    }, 300);
+
                 }
             });
         }
